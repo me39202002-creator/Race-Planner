@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>配速計算器 | Race Split Planner</title>
+    <!-- 新增圖示參照 -->
+    <link rel="icon" type="image/png" href="race-planner-Icon.png">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+        /* 自訂 Range Slider 樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #3b82f6;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 3px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        /* 自訂捲軸 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+
+    <div class="max-w-5xl w-full space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center pt-4 pb-2">
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center justify-center gap-3">
+                <i class="fa-solid fa-stopwatch text-blue-500"></i>
+                Race Split Planner
+            </h1>
+            <p class="mt-2 text-sm text-slate-500 font-medium">自訂每公里配速，精準規劃你的完賽策略</p>
+        </div>
+
+        <!-- Error Message Box (Hidden by default) -->
+        <div id="error-message" class="hidden bg-rose-50 border-l-4 border-rose-500 text-rose-700 p-4 rounded-r-lg shadow-sm transition-all" role="alert">
+            <div class="flex items-center">
+                <i class="fa-solid fa-circle-exclamation mr-2"></i>
+                <span id="error-text" class="font-medium text-sm">錯誤訊息</span>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Distance Input -->
+                <div>
+                    <label for="distance" class="block text-sm font-bold text-slate-700 mb-3">目標距離 (公里)</label>
+                    <div class="relative">
+                        <input type="number" id="distance" value="10" step="0.01" min="0.1" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                            <span class="text-slate-400 font-semibold">km</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button onclick="setDistance(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">5K</button>
+                        <button onclick="setDistance(10)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">10K</button>
+                        <button onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
+                        <button onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
+                    </div>
+                </div>
+
+                <!-- Time Input -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-3">目標完賽時間</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="relative group">
+                            <input type="number" id="hours" value="1" min="0" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
+                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">時</div>
+                        </div>
+                        <div class="relative group">
+                            <input type="number" id="minutes" value="0" min="0" max="59" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
+                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">分</div>
+                        </div>
+                        <div class="relative group">
+                            <input type="number" id="seconds" value="0" min="0" max="59" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
+                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">秒</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label for="strategy" class="block text-sm font-bold text-slate-700 mb-3">配速策略</label>
+                        <div class="relative">
+                            <select id="strategy" onchange="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none appearance-none font-medium cursor-pointer transition-all">
+                                <option value="even">均速：全程使用相同跑動配速</option>
+                                <option value="conservative">保守起跑：前 20% 慢 2%，再由後段逐步追回</option>
+                                <option value="negative">負分段：前 30% 慢 2%，後 30% 快 2%</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                                <i class="fa-solid fa-chevron-down text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="strategy-intensity" class="block text-sm font-bold text-slate-700 mb-3">變化幅度 (%)</label>
+                        <div class="relative">
+                            <input type="number" id="strategy-intensity" value="2" min="1" max="30" onchange="applyStrategy()" oninput="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <span class="text-slate-400 font-semibold">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <button onclick="initCustomBoard()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> 產生配速計畫表
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Area (Hidden until generated) -->
+        <div id="results-area" class="hidden flex-col gap-6 items-stretch opacity-0 transition-opacity duration-500 w-full mt-8">
+            
+            <!-- Strategies Panel (Top) - 互動波形圖 -->
+            <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[400px]">
+                <div class="bg-white p-4 sm:p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-blue-500"></i>
+                            策略波形圖
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">在圖表上拖曳節點，繪製專屬配速曲線</p>
+                    </div>
+                    <button onclick="resetWaveform()" class="text-xs text-slate-600 hover:text-blue-700 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors flex items-center gap-1 border border-transparent hover:border-blue-200">
+                        <i class="fa-solid fa-rotate-right"></i> 重置
+                    </button>
+                </div>
+                
+                <div class="flex-grow bg-slate-50 relative p-4 flex flex-col items-center justify-center select-none overflow-hidden">
+                    
+                    <!-- Y 軸標籤 (動態配速) -->
+                    <div class="absolute left-4 top-0 bottom-0 py-8 flex flex-col justify-between text-xs font-bold text-slate-400 pointer-events-none z-10 font-mono">
+                        <div id="y-axis-fast" class="flex flex-col items-center text-emerald-500 drop-shadow-sm"><i class="fa-solid fa-rabbit mb-1"></i>--:--</div>
+                        <div id="y-axis-even" class="bg-white/80 px-1 rounded drop-shadow-sm text-slate-500">--:--</div>
+                        <div id="y-axis-slow" class="flex flex-col items-center text-rose-500 drop-shadow-sm">--:--<i class="fa-solid fa-turtle mt-1"></i></div>
+                    </div>
+
+                    <!-- 互動式 SVG 容器 -->
+                    <div id="waveform-container" class="w-full h-full relative cursor-crosshair touch-none px-12 sm:px-16">
+                        <!-- SVG 將由 JS 動態注入 -->
+                    </div>
+
+                    <!-- 當前選中的節點資訊 Tooltip -->
+                    <div id="active-node-info" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 shadow-xl border border-slate-700 rounded-full px-5 py-2.5 text-sm font-bold text-white opacity-0 transition-opacity duration-150 pointer-events-none flex items-center gap-2 z-20">
+                        <span id="node-km" class="bg-slate-600 text-slate-100 px-2 py-0.5 rounded text-xs">--</span>
+                        <span id="node-val">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Panel (Bottom) -->
+            <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                <!-- Summary Header (黑色區塊) -->
+                <div id="summary-header" class="bg-[#111827] text-white p-6 grid grid-cols-3 divide-x divide-slate-700">
+                    <div class="text-center">
+                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">目標距離</div>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <div id="summary-distance" class="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">--</div>
+                            <span class="text-slate-400 text-sm font-bold">km</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">目標時間</div>
+                        <div id="summary-time" class="text-2xl sm:text-3xl font-black text-blue-400 font-mono tracking-tight">--</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-2">平均配速</div>
+                        <div class="flex items-baseline justify-center gap-1">
+                            <div id="summary-pace" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono tracking-tight">--</div>
+                            <span class="text-slate-400 text-sm font-bold">/km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="custom-scrollbar overflow-x-auto w-full">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 bg-white border-b border-slate-200">
+                            <tr>
+                                <th scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
+                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">該段配速</th>
+                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
+                                <th scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="divide-y divide-slate-100 bg-white">
+                            <!-- Table rows will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // Preset distance buttons helper
+        function setDistance(val) {
+            document.getElementById('distance').value = val;
+            
+            // Adjust default times based on common standards for better UX
+            if(val === 5) setTime(0, 30, 0);
+            if(val === 10) setTime(1, 0, 0);
+            if(val === 21.0975) setTime(2, 0, 0);
+            if(val === 42.195) setTime(4, 0, 0);
+            
+            // 觸發自動更新
+            updateBoardIfVisible();
+        }
+        
+        function setTime(h, m, s) {
+            document.getElementById('hours').value = h;
+            document.getElementById('minutes').value = m;
+            document.getElementById('seconds').value = s;
+        }
+        
+        // 檢查面板是否開啟，若已開啟則自動重新產生圖表與數據
+        function updateBoardIfVisible() {
+            const resultsArea = document.getElementById('results-area');
+            if (!resultsArea.classList.contains('hidden')) {
+                initCustomBoard();
+            }
+        }
+
+        // Display inline error message instead of alert
+        function showError(message) {
+            const errorBox = document.getElementById('error-message');
+            document.getElementById('error-text').innerText = message;
+            errorBox.classList.remove('hidden');
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                errorBox.classList.add('hidden');
+            }, 4000);
+        }
+
+        // Format total seconds into mm:ss or hh:mm:ss
+        function formatTime(totalSeconds) {
+            totalSeconds = Math.round(totalSeconds); 
+            let h = Math.floor(totalSeconds / 3600);
+            let m = Math.floor((totalSeconds % 3600) / 60);
+            let s = totalSeconds % 60;
+            
+            let timeStr = "";
+            if (h > 0) timeStr += h + ":";
+            timeStr += (m < 10 && h > 0 ? "0" : "") + m + ":";
+            timeStr += (s < 10 ? "0" : "") + s;
+            return timeStr;
+        }
+
+        // Format pace (always display as mm:ss)
+        function formatPace(totalSeconds) {
+            totalSeconds = Math.round(totalSeconds);
+            let m = Math.floor(totalSeconds / 60);
+            let s = totalSeconds % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        let paceVariations = []; // 儲存每公里的配速變異百分比 (-30 到 30)
+        let isDragging = false;
+        let activePointIndex = -1;
+        const MAX_VARIATION = 30; // 容許的最大配速變異 (% 快或慢)
+
+        function applyStrategy() {
+            const strategy = document.getElementById('strategy').value;
+            const intensity = parseFloat(document.getElementById('strategy-intensity').value) || 2;
+            
+            // UX 細節優化：動態修改下拉選單裡面的文字，讓描述的 % 數與用戶輸入的同步
+            const conservativeOpt = document.querySelector('option[value="conservative"]');
+            const negativeOpt = document.querySelector('option[value="negative"]');
+            if (conservativeOpt) conservativeOpt.innerText = `保守起跑：前 20% 慢 ${intensity}%，再由後段逐步追回`;
+            if (negativeOpt) negativeOpt.innerText = `負分段：前 30% 慢 ${intensity}%，後 30% 快 ${intensity}%`;
+
+            // 如果結果區域還沒顯示，就不執行後續圖表更新
+            if (document.getElementById('results-area').classList.contains('hidden')) {
+                return;
+            }
+
+            const distance = parseFloat(document.getElementById('distance').value);
+            const segments = Math.ceil(distance);
+            
+            if (isNaN(distance) || distance <= 0) return;
+
+            // 確保陣列長度正確
+            if (paceVariations.length !== segments) {
+                paceVariations = new Array(segments).fill(0);
+            }
+
+            // 若目前為圖表拖曳的「自訂」狀態，修改幅度不應覆蓋使用者畫的圖形，直接中斷
+            if (strategy === 'custom') {
+                return;
+            }
+
+            // 重置所有變異
+            paceVariations = paceVariations.map(() => 0);
+
+            if (strategy === 'conservative') {
+                // 保守起跑：前 20% 慢自訂 %，後段追回
+                const slowSegmentsCount = Math.floor(segments * 0.2) || 1; // 至少1段
+                for (let i = 0; i < slowSegmentsCount; i++) {
+                    paceVariations[i] = intensity; // 慢 X% (正值為慢)
+                }
+                // 剩下的段數平均分攤快回來的時間
+                const remainingSegments = segments - slowSegmentsCount;
+                if (remainingSegments > 0) {
+                    const totalCompensation = slowSegmentsCount * -intensity; // 總共需要補回的百分比 (負值為快)
+                    const compPerSegment = totalCompensation / remainingSegments;
+                    for (let i = slowSegmentsCount; i < segments; i++) {
+                        paceVariations[i] = compPerSegment;
+                    }
+                }
+            } else if (strategy === 'negative') {
+                // 負分段：前 30% 慢自訂 %，後 30% 快自訂 %
+                const phaseCount = Math.floor(segments * 0.3) || 1;
+                for (let i = 0; i < phaseCount; i++) {
+                    paceVariations[i] = intensity; // 前段慢
+                }
+                for (let i = segments - phaseCount; i < segments; i++) {
+                    paceVariations[i] = -intensity; // 後段快
+                }
+            }
+            // 'even' 策略因為一開始已經重置為 0，所以不需要額外處理
+
+            renderWaveform();
+            calculateSplits();
+        }
+
+        // 重置波形圖
+        function resetWaveform() {
+            paceVariations = paceVariations.map(() => 0);
+            renderWaveform();
+            calculateSplits();
+        }
+
+        // 初始化主面板與資料陣列
+        function initCustomBoard() {
+            const distanceInput = document.getElementById('distance').value;
+            const distance = parseFloat(distanceInput);
+            
+            const h = parseInt(document.getElementById('hours').value) || 0;
+            const m = parseInt(document.getElementById('minutes').value) || 0;
+            const s = parseInt(document.getElementById('seconds').value) || 0;
+            const totalSeconds = (h * 3600) + (m * 60) + s;
+
+            // 基礎驗證
+            if (isNaN(distance) || distance <= 0) {
+                showError("請輸入大於 0 的有效距離！");
+                return;
+            }
+            if (totalSeconds <= 0) {
+                showError("請輸入有效的目標完賽時間！");
+                return;
+            }
+
+            const segments = Math.ceil(distance);
+            
+            // 如果距離改變，重新初始化陣列
+            if (paceVariations.length !== segments) {
+                paceVariations = new Array(segments).fill(0);
+                
+                // 【修復重點】：距離改變時，原本畫的「自訂」曲線數量不對了，必須強制重置回「均速」策略
+                const strategySelect = document.getElementById('strategy');
+                if (strategySelect.value === 'custom') {
+                    strategySelect.value = 'even';
+                }
+            }
+
+            // 顯示結果區域
+            const resultsArea = document.getElementById('results-area');
+            resultsArea.classList.remove('hidden');
+            void resultsArea.offsetWidth; // 觸發重繪
+            resultsArea.classList.add('grid', 'opacity-100');
+            
+            setTimeout(() => {
+                resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // 啟動圖表與計算
+            initWaveformEvents();
+            
+            applyStrategy(); 
+        }
+
+        // 綁定圖表的拖曳事件
+        function initWaveformEvents() {
+            const container = document.getElementById('waveform-container');
+            if (container.dataset.initialized) return;
+
+            const getRelativeCoordinates = (e) => {
+                // 【修復偏移問題】：取得 SVG 元素本身的實體範圍，而不是外層有 padding 的 container
+                const svgElement = container.querySelector('svg');
+                const rect = svgElement ? svgElement.getBoundingClientRect() : container.getBoundingClientRect();
+                
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            };
+
+            const updatePoint = (e) => {
+                const pos = getRelativeCoordinates(e);
+                const paddingSide = 24; // SVG 左右 Padding
+                // 修改：由於外層 container 有 px-12 sm:px-16 的 padding，需要將其扣除才能得到正確的互動區域寬度
+                // 這裡我們直接使用 getBoundingClientRect 取得的寬度，因為事件是綁在 waveform-container 上
+                // 但為了更精確對齊 SVG 內部的座標系統，我們需要考慮 SVG 的 viewBox 比例
+                
+                const svgW = 800; // SVG 內部寬度
+                const svgH = 280; // SVG 內部高度
+                const pt = 40, pb = 40, pl = 24, pr = 24; // SVG 內部 padding
+                
+                // 計算滑鼠/觸控位置在 SVG viewBox 座標系中的相對 X 座標
+                const svgX = (pos.x / pos.width) * svgW;
+                
+                // 1. 找出最接近的 X 軸節點
+                const usableSvgWidth = svgW - pl - pr;
+                let percentX = usableSvgWidth > 0 ? (svgX - pl) / usableSvgWidth : 0;
+                percentX = Math.max(0, Math.min(1, percentX));
+                
+                const segments = paceVariations.length;
+                let index = Math.round(percentX * (segments - 1));
+                if (segments === 1) index = 0;
+                
+                // 2. 映射 Y 座標到數值 (-30% 到 +30%)
+                // 計算滑鼠/觸控位置在 SVG viewBox 座標系中的相對 Y 座標
+                const svgY = (pos.y / pos.height) * svgH;
+                const usableSvgHeight = svgH - pt - pb;
+                const centerY = pt + (usableSvgHeight / 2);
+                
+                // 座標轉換：上方為負(快)，下方為正(慢)
+                let rawVal = ((svgY - centerY) / (usableSvgHeight / 2)) * MAX_VARIATION;
+                let val = Math.round(rawVal);
+                val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, val));
+                
+                // 3. 更新資料並即時渲染
+                activePointIndex = index;
+                paceVariations[index] = val;
+                
+                const strategySelect = document.getElementById('strategy');
+                // 如果目前的選項不是自訂，則添加一個隱藏的"自訂"選項並選中它
+                let customOption = strategySelect.querySelector('option[value="custom"]');
+                if (!customOption) {
+                    customOption = document.createElement('option');
+                    customOption.value = "custom";
+                    customOption.text = "自訂策略 (已由圖表修改)";
+                    customOption.hidden = true; // 隱藏起來，只在手動修改時顯示
+                    strategySelect.appendChild(customOption);
+                }
+                strategySelect.value = "custom";
+                
+                renderWaveform();
+                calculateSplits();
+                showTooltip(index, val);
+            };
+
+            const handleStart = (e) => {
+                isDragging = true;
+                updatePoint(e);
+                if(e.cancelable) e.preventDefault(); // 防止手機滾動畫面
+            };
+
+            const handleMove = (e) => {
+                if (!isDragging) return;
+                updatePoint(e);
+                if(e.cancelable) e.preventDefault();
+            };
+
+            const handleEnd = () => {
+                isDragging = false;
+                activePointIndex = -1;
+                renderWaveform(); // 移除高亮狀態
+                hideTooltip();
+            };
+
+            // 滑鼠事件
+            container.addEventListener('mousedown', handleStart);
+            container.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+
+            // 觸控事件 (支援手機)
+            container.addEventListener('touchstart', handleStart, { passive: false });
+            container.addEventListener('touchmove', handleMove, { passive: false });
+            window.addEventListener('touchend', handleEnd);
+
+            container.dataset.initialized = 'true';
+        }
+
+        // 顯示懸浮資訊提示
+        function showTooltip(index, val) {
+            const tooltip = document.getElementById('active-node-info');
+            const kmLabel = document.getElementById('node-km');
+            const valLabel = document.getElementById('node-val');
+            
+            const distance = parseFloat(document.getElementById('distance').value);
+            let distLabel = (index === paceVariations.length - 1 && distance % 1 !== 0) ? 
+                            `最後 ${(distance % 1).toFixed(2)}km` : 
+                            `第 ${index + 1} km`;
+                            
+            kmLabel.innerText = distLabel;
+            
+            if(val < 0) {
+                valLabel.innerText = `快 ${Math.abs(val)}%`;
+                valLabel.className = 'text-emerald-400';
+            } else if (val > 0) {
+                valLabel.innerText = `慢 ${val}%`;
+                valLabel.className = 'text-rose-400';
+            } else {
+                valLabel.innerText = `平穩配速`;
+                valLabel.className = 'text-slate-300';
+            }
+            
+            tooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            document.getElementById('active-node-info').style.opacity = '0';
+        }
+
+        // 繪製 SVG 波形圖
+        function renderWaveform() {
+            const container = document.getElementById('waveform-container');
+            if(!container) return;
+            
+            // 使用內部固定的座標系統，確保各種螢幕寬度下的比例正確
+            const svgW = 800;
+            const svgH = 280;
+            const pt = 40, pb = 40, pl = 24, pr = 24; 
+            
+            const segments = paceVariations.length;
+            
+            // X, Y 座標轉換函數
+            const getX = (i) => pl + (segments > 1 ? (i / (segments - 1)) * (svgW - pl - pr) : (svgW - pl - pr) / 2);
+            const getY = (val) => pt + ((val + MAX_VARIATION) / (MAX_VARIATION * 2)) * (svgH - pt - pb);
+
+            // 1. 收集所有點的座標，同時產生節點的 HTML
+            const points = [];
+            let pointsHtml = '';
+            for(let i = 0; i < segments; i++) {
+                const x = getX(i);
+                const y = getY(paceVariations[i]);
+                points.push({x, y});
+                
+                const isActive = i === activePointIndex;
+                const r = isActive ? 12 : 7;
+                const fill = isActive ? '#3b82f6' : '#ffffff';
+                const strokeWidth = isActive ? 4 : 3;
+                const shadow = isActive ? `<circle cx="${x}" cy="${y}" r="20" fill="#3b82f6" opacity="0.2"/>` : '';
+                
+                pointsHtml += `
+                    ${shadow}
+                    <circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#3b82f6" stroke-width="${strokeWidth}" style="transition: all 0.1s ease-out;"/>
+                `;
+            }
+
+            // 2. 使用控制點演算法產生「平滑貝茲曲線 (C commands)」
+            let linePath = '';
+            if (points.length > 0) {
+                linePath += `M ${points[0].x} ${points[0].y}`;
+                const smoothing = 0.2; // 調整這個數值 (0.1 ~ 0.3) 可以改變曲線的圓滑程度
+                
+                // 計算控制點的 Helper 函數
+                const getControlPoint = (current, previous, next, reverse) => {
+                    const p = previous || current;
+                    const n = next || current;
+                    const lengthX = n.x - p.x;
+                    let lengthY = n.y - p.y;
+                    
+                    // 【新增修復邏輯】：防止貝茲曲線在平坦處或頂點產生溢出 (Overshoot)
+                    const slope1 = current.y - p.y;
+                    const slope2 = n.y - current.y;
+                    // 若前後斜率相乘小於等於 0 (代表遇到波峰、波谷、或平坦段)，強制將切線設為水平
+                    if (slope1 * slope2 <= 0) {
+                        lengthY = 0; 
+                    }
+
+                    // 根據前後點決定切線角度
+                    const angle = Math.atan2(lengthY, lengthX) + (reverse ? Math.PI : 0);
+                    const length = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)) * smoothing;
+                    return {
+                        x: current.x + Math.cos(angle) * length,
+                        y: current.y + Math.sin(angle) * length
+                    };
+                };
+
+                // 將每段點連成平滑曲線
+                for (let i = 1; i < points.length; i++) {
+                    const point = points[i];
+                    const cps = getControlPoint(points[i - 1], points[i - 2], point, false); // 起點的控制點
+                    const cpe = getControlPoint(point, points[i - 1], points[i + 1], true);  // 終點的控制點
+                    linePath += ` C ${cps.x},${cps.y} ${cpe.x},${cpe.y} ${point.x},${point.y}`;
+                }
+            }
+
+            // 建立漸層填充區域 (Line path 加上連接到底部的點)
+            let areaPath = linePath;
+            if (segments > 0) {
+                areaPath += ` L ${getX(segments - 1)} ${svgH - pb + 20} L ${getX(0)} ${svgH - pb + 20} Z`;
+            }
+
+            // 計算網格線的 Y 座標
+            const y0 = getY(-30);
+            const y15_f = getY(-15);
+            const yCenter = getY(0);
+            const y15_s = getY(15);
+            const yMax = getY(30);
+
+            // 組合 SVG
+            const svgContent = `
+                <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-full overflow-visible drop-shadow-sm" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- 背景網格線 -->
+                    <line x1="${pl}" y1="${y0}" x2="${svgW-pr}" y2="${y0}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="6 6" />
+                    <line x1="${pl}" y1="${y15_f}" x2="${svgW-pr}" y2="${y15_f}" stroke="#f1f5f9" stroke-width="1" />
+                    <line x1="${pl}" y1="${yCenter}" x2="${svgW-pr}" y2="${yCenter}" stroke="#94a3b8" stroke-width="2" />
+                    <line x1="${pl}" y1="${y15_s}" x2="${svgW-pr}" y2="${y15_s}" stroke="#f1f5f9" stroke-width="1" />
+                    <line x1="${pl}" y1="${yMax}" x2="${svgW-pr}" y2="${yMax}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="6 6" />
+                    
+                    <!-- 漸層填充面積 -->
+                    <path d="${areaPath}" fill="url(#areaGradient)" />
+                    
+                    <!-- 主折線 -->
+                    <path d="${linePath}" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
+                    
+                    <!-- 互動資料點 -->
+                    ${pointsHtml}
+                </svg>
+            `;
+            
+            container.innerHTML = svgContent;
+        }
+
+        // 核心邏輯：讀取陣列資料並計算各段配速
+        function calculateSplits() {
+            const distance = parseFloat(document.getElementById('distance').value);
+            const h = parseInt(document.getElementById('hours').value) || 0;
+            const m = parseInt(document.getElementById('minutes').value) || 0;
+            const s = parseInt(document.getElementById('seconds').value) || 0;
+            
+            const totalSeconds = (h * 3600) + (m * 60) + s;
+            const segments = Math.ceil(distance);
+            const avgPaceSec = totalSeconds / distance;
+            
+            // 動態更新 Y 軸標籤顯示的實際配速
+            const yAxisFast = document.getElementById('y-axis-fast');
+            const yAxisEven = document.getElementById('y-axis-even');
+            const yAxisSlow = document.getElementById('y-axis-slow');
+            if (yAxisFast && yAxisEven && yAxisSlow) {
+                // 快 MAX_VARIATION % 的配速 (秒數較少)
+                const fastPaceSec = avgPaceSec * (1 - (MAX_VARIATION / 100));
+                // 慢 MAX_VARIATION % 的配速 (秒數較多)
+                const slowPaceSec = avgPaceSec * (1 + (MAX_VARIATION / 100));
+                
+                yAxisFast.innerHTML = `<i class="fa-solid fa-rabbit mb-1"></i>${formatPace(fastPaceSec)}`;
+                yAxisEven.innerHTML = `<span class="bg-slate-50/80 px-1 rounded">${formatPace(avgPaceSec)}</span>`;
+                yAxisSlow.innerHTML = `${formatPace(slowPaceSec)}<i class="fa-solid fa-turtle mt-1"></i>`;
+            }
+
+            let weights = [];
+            let totalWeight = 0;
+
+            // 從 paceVariations 陣列獲取權重
+            for (let i = 0; i < segments; i++) {
+                let sliderValue = paceVariations[i]; // 例如: -10 代表快 10%
+                
+                // 權重公式：(1 + 變化率) * 距離
+                let segmentDist = (i === segments - 1 && distance % 1 !== 0) ? (distance % 1) : 1;
+                let weight = (1 + (sliderValue / 100)) * segmentDist;
+                
+                weights.push({ dist: segmentDist, w: weight });
+                totalWeight += weight;
+            }
+
+            // 更新 Summary Header
+            document.getElementById('summary-distance').innerText = `${distance.toFixed(2)} km`;
+            document.getElementById('summary-time').innerText = formatTime(totalSeconds);
+            document.getElementById('summary-pace').innerText = `${formatPace(avgPaceSec)} /km`;
+
+            // 建立 Table Rows
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            let cumulativeTime = 0;
+            let cumulativeDist = 0;
+
+
+
+            for (let i = 0; i < weights.length; i++) {
+                // 將總時間按比例分配
+                let segmentTime = totalSeconds * (weights[i].w / totalWeight);
+                cumulativeTime += segmentTime;
+                
+                let segmentDist = weights[i].dist;
+                cumulativeDist += segmentDist;
+                
+                // 計算該路段實際配速
+                let paceForThisSegment = segmentTime / segmentDist;
+
+                let rowLabel = (i === weights.length - 1 && distance % 1 !== 0) ? 
+                               `${(cumulativeDist - segmentDist).toFixed(2)} ~ ${cumulativeDist.toFixed(2)}` : 
+                               `${i + 1}`;
+
+                // 配速快慢的顏色標記
+                let paceColorClass = "text-slate-700 font-semibold";
+                let paceBg = "";
+                if (paceForThisSegment < avgPaceSec - 1) {
+                    paceColorClass = "text-emerald-600 font-bold"; 
+                    paceBg = "bg-emerald-50/50";
+                }
+                if (paceForThisSegment > avgPaceSec + 1) {
+                    paceColorClass = "text-rose-600 font-bold";
+                    paceBg = "bg-rose-50/50";
+                }
+                
+                // 高亮正在拖拉的那一行
+                if (i === activePointIndex) {
+                    paceBg = "bg-blue-100/50 ring-inset ring-2 ring-blue-500/20";
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${paceBg}`;
+                tr.innerHTML = `
+                    <td class="px-6 py-3.5 whitespace-nowrap text-sm font-medium text-slate-500 font-mono">
+                        <span class="text-xs text-slate-400 mr-1">km</span>${rowLabel}
+                    </td>
+                    <td class="px-6 py-3.5 whitespace-nowrap text-center text-base ${paceColorClass} font-mono">
+                        ${formatPace(paceForThisSegment)}
+                    </td>
+                    <td class="px-6 py-3.5 whitespace-nowrap text-center text-sm text-slate-500 font-mono">
+                        ${formatTime(segmentTime)}
+                    </td>
+                    <td class="px-6 py-3.5 whitespace-nowrap text-right font-bold text-slate-800 font-mono">
+                        ${formatTime(cumulativeTime)}
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            }
+        }
+    </script>
+</body>
+</html>
