@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
     <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png">
+    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -586,6 +586,7 @@
         let paceVariations = []; 
         let isDragging = false;
         let activePointIndex = -1;
+        let lockedPointIndex = -1; /* 新增這行：用來鎖定正在拖曳的節點 */
         const MAX_VARIATION = 50; 
 
         function applyStrategy() {
@@ -686,20 +687,40 @@
                 return { x: clientX - rect.left, y: clientY - rect.top, width: rect.width, height: rect.height };
             };
 
-            const updatePoint = (e) => {
+            /* 新增 isStart 參數，用來判斷現在是剛點擊還是正在拖曳 */
+            const updatePoint = (e, isStart = false) => {
                 const pos = getRelativeCoordinates(e);
                 const svgW = 800, svgH = 280, pt = 40, pb = 40, pl = 24, pr = 24;
-                const svgX = (pos.x / pos.width) * svgW;
                 
-                const usableSvgWidth = svgW - pl - pr;
-                let percentX = usableSvgWidth > 0 ? (svgX - pl) / usableSvgWidth : 0;
-                percentX = Math.max(0, Math.min(1, percentX));
+                // 先算出當下滑鼠在 SVG 裡面的絕對座標
+                const svgX = (pos.x / pos.width) * svgW;
+                const svgY = (pos.y / pos.height) * svgH;
                 
                 const segments = paceVariations.length;
-                let index = Math.round(percentX * (segments - 1));
-                if (segments === 1) index = 0;
+                let index;
+
+                /* 只有在「剛點擊」的瞬間，才根據 X 座標尋找最近的節點並鎖定 */
+                if (isStart) {
+                    // 【黃色區域限制】檢查點擊是否在圖表的有效網格內 (容許 15px 的手指觸控緩衝)
+                    const buffer = 15;
+                    if (svgX < pl - buffer || svgX > (svgW - pr) + buffer || 
+                        svgY < pt - buffer || svgY > (svgH - pb) + buffer) {
+                        return false; // 點擊在紅色的外部空白區，拒絕觸發修改
+                    }
+
+                    const usableSvgWidth = svgW - pl - pr;
+                    let percentX = usableSvgWidth > 0 ? (svgX - pl) / usableSvgWidth : 0;
+                    percentX = Math.max(0, Math.min(1, percentX));
+                    
+                    index = Math.round(percentX * (segments - 1));
+                    if (segments === 1) index = 0;
+                    lockedPointIndex = index;
+                } else {
+                    /* 拖曳過程中，強制更新被鎖定的節點，忽略滑鼠的水平偏移 */
+                    index = lockedPointIndex;
+                    if (index === -1) return false;
+                }
                 
-                const svgY = (pos.y / pos.height) * svgH;
                 const usableSvgHeight = svgH - pt - pb;
                 const centerY = pt + (usableSvgHeight / 2);
                 
@@ -736,23 +757,27 @@
                 const actualPaceSec = baselinePaceSec * (1 + (val / 100));
                 
                 showTooltip(index, actualPaceSec, val);
+                return true; // 成功更新，回傳 true
             };
 
             const handleStart = (e) => {
-                isDragging = true;
-                updatePoint(e);
-                if(e.cancelable) e.preventDefault(); 
+                // 只有當 updatePoint 回傳 true (點在黃色有效區域內) 時，才啟動拖曳狀態
+                if (updatePoint(e, true)) {
+                    isDragging = true;
+                    if(e.cancelable) e.preventDefault(); 
+                }
             };
 
             const handleMove = (e) => {
                 if (!isDragging) return;
-                updatePoint(e);
+                updatePoint(e, false); /* 傳入 false，代表這是移動過程 */
                 if(e.cancelable) e.preventDefault();
             };
 
             const handleEnd = () => {
                 isDragging = false;
                 activePointIndex = -1;
+                lockedPointIndex = -1; /* 結束拖曳時解除鎖定 */
                 renderWaveform(); 
                 hideTooltip();
             };
