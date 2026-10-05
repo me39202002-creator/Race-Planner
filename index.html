@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
     <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
+    <link rel="icon" type="image/png" href="race-planner-Icon.png">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -70,20 +70,28 @@
         
         <!-- Header -->
         <div class="relative text-center pt-4 pb-2">
-            <!-- 右上角版本與更新時間標籤 -->
-            <div class="sm:absolute sm:right-0 sm:top-2 flex items-center justify-center sm:flex-col sm:items-end gap-1.5 text-xs text-slate-400 mb-3 sm:mb-0 select-none">
-                <span class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono border border-slate-200 transition-colors shadow-xs">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    v2.1
-                </span>
-                <span class="text-[11px] font-mono text-slate-400">更新於 2026.10.05</span>
+            <!-- 右上角版本資訊與中英文切換 -->
+            <div class="sm:absolute sm:right-0 sm:top-2 flex items-center justify-center sm:flex-col sm:items-end gap-2 text-xs text-slate-400 mb-3 sm:mb-0 select-none">
+                <!-- 語系切換按鈕 -->
+                <div class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                    <button id="lang-btn-zh" onclick="setLanguage('zh')" class="px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all">中文</button>
+                    <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all">EN</button>
+                </div>
+                <!-- 版本與日期徽章 -->
+                <div class="flex items-center sm:flex-col sm:items-end gap-1.5">
+                    <span class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono border border-slate-200 transition-colors shadow-xs">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        v2.2
+                    </span>
+                    <span id="label-updated-date" class="text-[11px] font-mono text-slate-400">更新於 2026.10.05</span>
+                </div>
             </div>
 
             <h1 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center justify-center gap-3">
                 <i class="fa-solid fa-stopwatch text-blue-500"></i>
                 Race Split Planner
             </h1>
-            <p class="mt-2 text-sm text-slate-500 font-medium">自訂每公里配速，精準規劃你的完賽策略</p>
+            <p id="label-subtitle" class="mt-2 text-sm text-slate-500 font-medium">自訂每公里配速，精準規劃你的完賽策略</p>
         </div>
 
         <!-- Error Message Box -->
@@ -102,7 +110,7 @@
                 <!-- Distance & Interval Input -->
                 <div class="space-y-4">
                     <div>
-                        <label for="distance" class="block text-sm font-bold text-slate-700 mb-2">目標距離 (公里)</label>
+                        <label id="label-target-distance" for="distance" class="block text-sm font-bold text-slate-700 mb-2">目標距離 (公里)</label>
                         <div class="relative">
                             <input type="number" id="distance" value="10" step="0.01" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
@@ -112,47 +120,50 @@
                         <div class="mt-2.5 flex flex-wrap gap-2">
                             <button onclick="setDistance(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">5K</button>
                             <button onclick="setDistance(10)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">10K</button>
-                            <button onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
-                            <button onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
+                            <button id="btn-half-marathon" onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
+                            <button id="btn-full-marathon" onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
                         </div>
                     </div>
 
                     <!-- 分段間隔設定 -->
                     <div class="pt-2 border-t border-slate-100">
                         <label for="split-interval" class="block text-sm font-bold text-slate-700 mb-2 flex items-center justify-between">
-                            <span>分段間隔 (公里)</span>
-                            <span class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
+                            <span id="label-split-interval">分段間隔 (公里)</span>
+                            <span id="label-split-desc" class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
                         </label>
                         <div class="relative">
-                            <input type="number" id="split-interval" value="1" step="0.5" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
+                            <input type="number" id="split-interval" value="1" step="0.5" min="1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                <span class="text-slate-400 font-semibold">km/段</span>
+                                <span id="label-unit-interval" class="text-slate-400 font-semibold">km/段</span>
                             </div>
                         </div>
                         <div class="mt-2 flex flex-wrap gap-2">
-                            <button onclick="setIntervalVal(1)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 1 km</button>
-                            <button onclick="setIntervalVal(2)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2 km</button>
-                            <button onclick="setIntervalVal(2.5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2.5 km</button>
-                            <button onclick="setIntervalVal(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 5 km</button>
+                            <button id="btn-int-1" onclick="setIntervalVal(1)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 1 km</button>
+                            <button id="btn-int-2" onclick="setIntervalVal(2)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2 km</button>
+                            <button id="btn-int-25" onclick="setIntervalVal(2.5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2.5 km</button>
+                            <button id="btn-int-5" onclick="setIntervalVal(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 5 km</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Time Input (基準時間) -->
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-3">基準目標時間 <span class="font-normal text-xs text-slate-400 ml-1">(圖表0%基準線)</span></label>
+                    <label class="block text-sm font-bold text-slate-700 mb-3">
+                        <span id="label-target-time">基準目標時間</span>
+                        <span id="label-baseline-note" class="font-normal text-xs text-slate-400 ml-1">(圖表0%基準線)</span>
+                    </label>
                     <div class="grid grid-cols-3 gap-3">
                         <div class="relative group">
                             <input type="number" id="hours" value="1" min="0" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">時</div>
+                            <div id="unit-hours" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">時</div>
                         </div>
                         <div class="relative group">
                             <input type="number" id="minutes" value="0" min="0" max="59" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">分</div>
+                            <div id="unit-minutes" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">分</div>
                         </div>
                         <div class="relative group">
                             <input type="number" id="seconds" value="0" min="0" max="59" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">秒</div>
+                            <div id="unit-seconds" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">秒</div>
                         </div>
                     </div>
                 </div>
@@ -161,7 +172,7 @@
             <div class="mt-6 pt-6 border-t border-slate-100">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="sm:col-span-2">
-                        <label for="strategy" class="block text-sm font-bold text-slate-700 mb-3">配速策略</label>
+                        <label id="label-pacing-strategy" for="strategy" class="block text-sm font-bold text-slate-700 mb-3">配速策略</label>
                         <div class="relative">
                             <select id="strategy" onchange="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none appearance-none font-medium cursor-pointer transition-all">
                                 <option value="even">均速：全程使用相同跑動配速</option>
@@ -174,9 +185,8 @@
                         </div>
                     </div>
                     <div>
-                        <label for="strategy-intensity" class="block text-sm font-bold text-slate-700 mb-3">變化幅度 (%)</label>
+                        <label id="label-intensity" for="strategy-intensity" class="block text-sm font-bold text-slate-700 mb-3">變化幅度 (%)</label>
                         <div class="relative">
-                            <!-- 變異幅度支援到 50% -->
                             <input type="number" id="strategy-intensity" value="2" min="1" max="50" onchange="applyStrategy()" oninput="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                 <span class="text-slate-400 font-semibold">%</span>
@@ -187,8 +197,8 @@
             </div>
 
             <div class="mt-8">
-                <button onclick="initCustomBoard()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> 產生配速計畫表
+                <button id="btn-generate-plan" onclick="initCustomBoard()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>產生配速計畫表</span>
                 </button>
             </div>
         </div>
@@ -200,14 +210,14 @@
             <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[400px]">
                 <div class="bg-white p-4 sm:p-5 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10 shadow-sm">
                     <div>
-                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                        <h3 id="label-chart-title" class="font-bold text-slate-800 text-base flex items-center gap-2">
                             <i class="fa-solid fa-chart-area text-blue-500"></i>
                             策略波形圖
                         </h3>
-                        <p class="text-xs text-slate-500 mt-1">在圖表上拖曳節點，繪製專屬配速曲線</p>
+                        <p id="label-chart-desc" class="text-xs text-slate-500 mt-1">在圖表上拖曳節點，繪製專屬配速曲線</p>
                     </div>
-                    <button onclick="resetWaveform()" class="text-xs text-slate-600 hover:text-blue-700 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors flex items-center gap-1 border border-transparent hover:border-blue-200">
-                        <i class="fa-solid fa-rotate-right"></i> 重置
+                    <button id="btn-reset-waveform" onclick="resetWaveform()" class="text-xs text-slate-600 hover:text-blue-700 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors flex items-center gap-1 border border-transparent hover:border-blue-200">
+                        <i class="fa-solid fa-rotate-right"></i> <span>重置</span>
                     </button>
                 </div>
                 
@@ -237,17 +247,17 @@
                 <!-- Summary Header (即時計算結果) -->
                 <div id="summary-header" class="bg-[#111827] text-white p-4 sm:p-6 grid grid-cols-3 divide-x divide-slate-700">
                     <div class="text-center px-1 sm:px-0">
-                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">目標距離</div>
+                        <div id="label-sum-dist" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">目標距離</div>
                         <div class="flex items-baseline justify-center gap-1">
                             <div id="summary-distance" class="text-lg sm:text-3xl font-black text-white font-mono tracking-tight">--</div>
                         </div>
                     </div>
                     <div class="text-center px-1 sm:px-0">
-                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-blue-300">預估完賽時間</div>
+                        <div id="label-sum-time" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-blue-300">預估完賽時間</div>
                         <div id="summary-time" class="text-lg sm:text-3xl font-black text-blue-400 font-mono tracking-tight transition-colors duration-300">--</div>
                     </div>
                     <div class="text-center px-1 sm:px-0">
-                        <div class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-emerald-300">實質平均配速</div>
+                        <div id="label-sum-pace" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-emerald-300">實質平均配速</div>
                         <div class="flex items-baseline justify-center gap-1">
                             <div id="summary-pace" class="text-lg sm:text-3xl font-black text-emerald-400 font-mono tracking-tight transition-colors duration-300">--</div>
                         </div>
@@ -259,13 +269,13 @@
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs text-slate-500 bg-white border-b border-slate-200">
                             <tr>
-                                <th scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
-                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">
-                                    該段配速
-                                    <span class="block text-[10px] text-blue-500 font-normal">可直接輸入修改 (分:秒)</span>
+                                <th id="th-segment" scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
+                                <th id="th-pace" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">
+                                    <span>該段配速</span>
+                                    <span id="th-pace-sub" class="block text-[10px] text-blue-500 font-normal">可直接輸入修改 (分:秒)</span>
                                 </th>
-                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
-                                <th scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
+                                <th id="th-split-time" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
+                                <th id="th-cum-time" scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-slate-100 bg-white">
@@ -279,6 +289,162 @@
     </div>
 
     <script>
+        let currentLang = 'zh';
+
+        const i18n = {
+            zh: {
+                pageTitle: "配速計算器 | Race Split Planner",
+                updatedDate: "更新於 2026.10.05",
+                subtitle: "自訂每公里配速，精準規劃你的完賽策略",
+                targetDistance: "目標距離 (公里)",
+                halfMarathon: "半馬 (21K)",
+                fullMarathon: "全馬 (42K)",
+                splitInterval: "分段間隔 (公里)",
+                splitDesc: "依設定公里數劃分節點",
+                unitInterval: "km/段",
+                int1: "每 1 km",
+                int2: "每 2 km",
+                int25: "每 2.5 km",
+                int5: "每 5 km",
+                targetTime: "基準目標時間",
+                baselineNote: "(圖表0%基準線)",
+                unitHours: "時",
+                unitMinutes: "分",
+                unitSeconds: "秒",
+                pacingStrategy: "配速策略",
+                intensity: "變化幅度 (%)",
+                evenOpt: "均速：全程使用相同跑動配速",
+                conservativeOpt: (pct) => `保守起跑：前 20% 慢 ${pct}%，再由後段逐步追回`,
+                negativeOpt: (pct) => `負分段：前 30% 慢 ${pct}%，後 30% 快 ${pct}%`,
+                customOptChart: "自訂策略 (已由圖表修改)",
+                customOptTable: "自訂策略 (已由圖表/表格修改)",
+                generateBtn: "產生配速計畫表",
+                chartTitle: "策略波形圖",
+                chartDesc: "在圖表上拖曳節點，繪製專屬配速曲線",
+                resetBtn: "重置",
+                sumDist: "目標距離",
+                sumTime: "預估完賽時間",
+                sumPace: "實質平均配速",
+                thSegment: "路段 (KM)",
+                thPace: "該段配速",
+                thPaceSub: "可直接輸入修改 (分:秒)",
+                thSplitTime: "單段耗時",
+                thCumTime: "累積時間",
+                tooltipPace: "配速",
+                segLabel: (idx) => `第 ${idx + 1} 段`,
+                inputTooltip: "點擊可直接修改此段配速 (例如 5:30)",
+                errDist: "請輸入大於 0 的有效距離！",
+                errInterval: "請輸入大於 0 的有效分段間隔！",
+                errTime: "請輸入有效的基準目標時間！",
+                errPaceFormat: "請輸入有效的配速格式 (例如 5:30)"
+            },
+            en: {
+                pageTitle: "Race Split Planner | Pacing Calculator",
+                updatedDate: "Updated 2026.10.05",
+                subtitle: "Customize splits per km to master your race strategy",
+                targetDistance: "Target Distance (km)",
+                halfMarathon: "Half (21.1K)",
+                fullMarathon: "Full (42.2K)",
+                splitInterval: "Split Interval (km)",
+                splitDesc: "Segment distance for each node",
+                unitInterval: "km/split",
+                int1: "Every 1 km",
+                int2: "Every 2 km",
+                int25: "Every 2.5 km",
+                int5: "Every 5 km",
+                targetTime: "Baseline Target Time",
+                baselineNote: "(Chart 0% baseline)",
+                unitHours: "hr",
+                unitMinutes: "min",
+                unitSeconds: "sec",
+                pacingStrategy: "Pacing Strategy",
+                intensity: "Variation (%)",
+                evenOpt: "Even Split: Maintain uniform pace throughout",
+                conservativeOpt: (pct) => `Conservative: First 20% slower by ${pct}%, made up later`,
+                negativeOpt: (pct) => `Negative Split: First 30% +${pct}%, last 30% -${pct}%`,
+                customOptChart: "Custom (Adjusted via chart)",
+                customOptTable: "Custom (Adjusted via chart/table)",
+                generateBtn: "Generate Split Plan",
+                chartTitle: "Pacing Waveform",
+                chartDesc: "Drag points on chart to shape your pacing strategy",
+                resetBtn: "Reset",
+                sumDist: "TARGET DISTANCE",
+                sumTime: "PROJECTED FINISH TIME",
+                sumPace: "EFFECTIVE AVERAGE PACE",
+                thSegment: "Segment (KM)",
+                thPace: "Split Pace",
+                thPaceSub: "Editable (min:sec)",
+                thSplitTime: "Split Duration",
+                thCumTime: "Cumulative Time",
+                tooltipPace: "Pace",
+                segLabel: (idx) => `Split ${idx + 1}`,
+                inputTooltip: "Click to edit split pace (e.g. 5:30)",
+                errDist: "Please enter a valid distance greater than 0!",
+                errInterval: "Please enter a valid split interval greater than 0!",
+                errTime: "Please enter a valid baseline target time!",
+                errPaceFormat: "Please enter a valid pace format (e.g. 5:30)"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            // 按鈕切換樣式
+            const btnZh = document.getElementById('lang-btn-zh');
+            const btnEn = document.getElementById('lang-btn-en');
+            if (lang === 'zh') {
+                btnZh.className = "px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all";
+                btnEn.className = "px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all";
+            } else {
+                btnEn.className = "px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all";
+                btnZh.className = "px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all";
+            }
+
+            // 更新文字內容
+            document.title = t.pageTitle;
+            document.getElementById('label-updated-date').innerText = t.updatedDate;
+            document.getElementById('label-subtitle').innerText = t.subtitle;
+            document.getElementById('label-target-distance').innerText = t.targetDistance;
+            document.getElementById('btn-half-marathon').innerText = t.halfMarathon;
+            document.getElementById('btn-full-marathon').innerText = t.fullMarathon;
+
+            document.getElementById('label-split-interval').innerText = t.splitInterval;
+            document.getElementById('label-split-desc').innerText = t.splitDesc;
+            document.getElementById('label-unit-interval').innerText = t.unitInterval;
+            document.getElementById('btn-int-1').innerText = t.int1;
+            document.getElementById('btn-int-2').innerText = t.int2;
+            document.getElementById('btn-int-25').innerText = t.int25;
+            document.getElementById('btn-int-5').innerText = t.int5;
+
+            document.getElementById('label-target-time').innerText = t.targetTime;
+            document.getElementById('label-baseline-note').innerText = t.baselineNote;
+            document.getElementById('unit-hours').innerText = t.unitHours;
+            document.getElementById('unit-minutes').innerText = t.unitMinutes;
+            document.getElementById('unit-seconds').innerText = t.unitSeconds;
+
+            document.getElementById('label-pacing-strategy').innerText = t.pacingStrategy;
+            document.getElementById('label-intensity').innerText = t.intensity;
+
+            document.getElementById('btn-generate-plan').querySelector('span').innerText = t.generateBtn;
+            document.getElementById('label-chart-title').innerHTML = `<i class="fa-solid fa-chart-area text-blue-500"></i> ${t.chartTitle}`;
+            document.getElementById('label-chart-desc').innerText = t.chartDesc;
+            document.getElementById('btn-reset-waveform').querySelector('span').innerText = t.resetBtn;
+
+            document.getElementById('label-sum-dist').innerText = t.sumDist;
+            document.getElementById('label-sum-time').innerText = t.sumTime;
+            document.getElementById('label-sum-pace').innerText = t.sumPace;
+
+            document.getElementById('th-segment').innerText = t.thSegment;
+            document.getElementById('th-pace').querySelector('span:first-child').innerText = t.thPace;
+            document.getElementById('th-pace-sub').innerText = t.thPaceSub;
+            document.getElementById('th-split-time').innerText = t.thSplitTime;
+            document.getElementById('th-cum-time').innerText = t.thCumTime;
+
+            // 重新刷新策略選單文字與計算表
+            applyStrategy();
+        }
+
         function setDistance(val) {
             document.getElementById('distance').value = val;
             if(val === 5) setTime(0, 30, 0);
@@ -366,7 +532,7 @@
             }
             const num = parseFloat(s);
             if (!isNaN(num)) {
-                if (num >= 100) { // 例: 530 -> 5 分 30 秒
+                if (num >= 100) {
                     const min = Math.floor(num / 100);
                     const sec = Math.round(num % 100);
                     return (min * 60) + sec;
@@ -376,8 +542,8 @@
             return null;
         }
 
-        // 用戶直接在表格中修改配速時的雙向連動處理
         function handlePaceInputChange(index, value) {
+            const t = i18n[currentLang];
             const newPaceSec = parsePaceInput(value);
             const distance = parseFloat(document.getElementById('distance').value);
             const h = parseInt(document.getElementById('hours').value) || 0;
@@ -390,26 +556,26 @@
             const baselinePaceSec = baselineTotalSeconds / distance;
             
             if (!newPaceSec || newPaceSec <= 0) {
-                showError("請輸入有效的配速格式 (例如 5:30)");
+                showError(t.errPaceFormat);
                 calculateSplits();
                 return;
             }
             
-            // 計算相對於基準配速的變異百分比
             let val = ((newPaceSec / baselinePaceSec) - 1) * 100;
             val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, Math.round(val)));
             
             paceVariations[index] = val;
             
-            // 將策略標記為自訂
             const strategySelect = document.getElementById('strategy');
             let customOption = strategySelect.querySelector('option[value="custom"]');
             if (!customOption) {
                 customOption = document.createElement('option');
                 customOption.value = "custom";
-                customOption.text = "自訂策略 (已由圖表/表格修改)";
+                customOption.text = t.customOptTable;
                 customOption.hidden = true;
                 strategySelect.appendChild(customOption);
+            } else {
+                customOption.text = t.customOptTable;
             }
             strategySelect.value = "custom";
             
@@ -423,13 +589,20 @@
         const MAX_VARIATION = 50; 
 
         function applyStrategy() {
-            const strategy = document.getElementById('strategy').value;
+            const t = i18n[currentLang];
+            const strategySelect = document.getElementById('strategy');
+            const strategy = strategySelect.value;
             const intensity = parseFloat(document.getElementById('strategy-intensity').value) || 2;
             
-            const conservativeOpt = document.querySelector('option[value="conservative"]');
-            const negativeOpt = document.querySelector('option[value="negative"]');
-            if (conservativeOpt) conservativeOpt.innerText = `保守起跑：前 20% 慢 ${intensity}%，再由後段逐步追回`;
-            if (negativeOpt) negativeOpt.innerText = `負分段：前 30% 慢 ${intensity}%，後 30% 快 ${intensity}%`;
+            const evenOpt = strategySelect.querySelector('option[value="even"]');
+            const conservativeOpt = strategySelect.querySelector('option[value="conservative"]');
+            const negativeOpt = strategySelect.querySelector('option[value="negative"]');
+            const customOpt = strategySelect.querySelector('option[value="custom"]');
+
+            if (evenOpt) evenOpt.innerText = t.evenOpt;
+            if (conservativeOpt) conservativeOpt.innerText = t.conservativeOpt(intensity);
+            if (negativeOpt) negativeOpt.innerText = t.negativeOpt(intensity);
+            if (customOpt) customOpt.innerText = t.customOptChart;
 
             if (document.getElementById('results-area').classList.contains('hidden')) return;
 
@@ -470,6 +643,7 @@
         }
 
         function initCustomBoard() {
+            const t = i18n[currentLang];
             const distance = parseFloat(document.getElementById('distance').value);
             const interval = parseFloat(document.getElementById('split-interval').value);
             const h = parseInt(document.getElementById('hours').value) || 0;
@@ -477,9 +651,9 @@
             const s = parseInt(document.getElementById('seconds').value) || 0;
             const totalSeconds = (h * 3600) + (m * 60) + s;
 
-            if (isNaN(distance) || distance <= 0) { showError("請輸入大於 0 的有效距離！"); return; }
-            if (isNaN(interval) || interval <= 0) { showError("請輸入大於 0 的有效分段間隔！"); return; }
-            if (totalSeconds <= 0) { showError("請輸入有效的基準目標時間！"); return; }
+            if (isNaN(distance) || distance <= 0) { showError(t.errDist); return; }
+            if (isNaN(interval) || interval <= 0) { showError(t.errInterval); return; }
+            if (totalSeconds <= 0) { showError(t.errTime); return; }
 
             const { segments } = getSegmentsInfo();
             const totalSegments = segments.length;
@@ -537,13 +711,16 @@
                 paceVariations[index] = val;
                 
                 const strategySelect = document.getElementById('strategy');
+                const t = i18n[currentLang];
                 let customOption = strategySelect.querySelector('option[value="custom"]');
                 if (!customOption) {
                     customOption = document.createElement('option');
                     customOption.value = "custom";
-                    customOption.text = "自訂策略 (已由圖表修改)";
+                    customOption.text = t.customOptChart;
                     customOption.hidden = true;
                     strategySelect.appendChild(customOption);
+                } else {
+                    customOption.text = t.customOptChart;
                 }
                 strategySelect.value = "custom";
                 
@@ -595,16 +772,17 @@
             const tooltip = document.getElementById('active-node-info');
             const kmLabel = document.getElementById('node-km');
             const valLabel = document.getElementById('node-val');
+            const t = i18n[currentLang];
             
             const { segments } = getSegmentsInfo();
             const seg = segments[index];
-            let distLabel = `第 ${index + 1} 段`;
+            let distLabel = t.segLabel(index);
             if (seg) {
                 distLabel = `${seg.startKm.toFixed(seg.startKm % 1 === 0 ? 0 : 2)} ~ ${seg.endKm.toFixed(seg.endKm % 1 === 0 ? 0 : 2)} km`;
             }
                             
             kmLabel.innerText = distLabel;
-            valLabel.innerText = `配速 ${formatPace(actualPaceSec)}`;
+            valLabel.innerText = `${t.tooltipPace} ${formatPace(actualPaceSec)}`;
             
             if(val < 0) {
                 valLabel.className = 'text-emerald-400 font-mono tracking-tight';
@@ -792,6 +970,7 @@
             tableBody.innerHTML = '';
             
             let cumulativeTime = 0;
+            const t = i18n[currentLang];
 
             for (let i = 0; i < segmentsData.length; i++) {
                 let segmentDist = segmentsData[i].dist;
@@ -828,7 +1007,7 @@
                                value="${formatPace(paceForThisSegment)}"
                                onchange="handlePaceInputChange(${i}, this.value)"
                                class="w-20 text-center font-mono font-bold text-base ${paceColorClass} bg-slate-50/80 hover:bg-white focus:bg-white hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border border-slate-200 rounded-lg py-1 px-1 transition-all outline-none shadow-sm cursor-text"
-                               title="點擊可直接修改此段配速 (例如 5:30)">
+                               title="${t.inputTooltip}">
                     </td>
                     <td class="px-6 py-3.5 whitespace-nowrap text-center text-sm text-slate-500 font-mono">
                         ${formatTime(segmentTime)}
