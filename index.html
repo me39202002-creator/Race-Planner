@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
     <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png">
+    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -69,7 +69,16 @@
     <div class="max-w-5xl w-full space-y-6">
         
         <!-- Header -->
-        <div class="text-center pt-4 pb-2">
+        <div class="relative text-center pt-4 pb-2">
+            <!-- 右上角版本與更新時間標籤 -->
+            <div class="sm:absolute sm:right-0 sm:top-2 flex items-center justify-center sm:flex-col sm:items-end gap-1.5 text-xs text-slate-400 mb-3 sm:mb-0 select-none">
+                <span class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono border border-slate-200 transition-colors shadow-xs">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    v2.1
+                </span>
+                <span class="text-[11px] font-mono text-slate-400">更新於 2026.10.05</span>
+            </div>
+
             <h1 class="text-3xl font-bold text-slate-900 tracking-tight flex items-center justify-center gap-3">
                 <i class="fa-solid fa-stopwatch text-blue-500"></i>
                 Race Split Planner
