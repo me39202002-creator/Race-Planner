@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
     <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
+    <link rel="icon" type="image/png" href="race-planner-Icon.png">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,11 +20,13 @@
         /* 自訂 Range Slider 樣式 */
         input[type=range] {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             background: transparent;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
+            appearance: none;
             height: 20px;
             width: 20px;
             border-radius: 50%;
@@ -113,7 +115,7 @@
                             <span class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
                         </label>
                         <div class="relative">
-                            <input type="number" id="split-interval" value="1" step="0.5" min="1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
+                            <input type="number" id="split-interval" value="1" step="0.5" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                                 <span class="text-slate-400 font-semibold">km/段</span>
                             </div>
@@ -249,7 +251,10 @@
                         <thead class="text-xs text-slate-500 bg-white border-b border-slate-200">
                             <tr>
                                 <th scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
-                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">該段配速</th>
+                                <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">
+                                    該段配速
+                                    <span class="block text-[10px] text-blue-500 font-normal">可直接輸入修改 (分:秒)</span>
+                                </th>
                                 <th scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
                                 <th scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
                             </tr>
@@ -338,6 +343,69 @@
             let m = Math.floor(totalSeconds / 60);
             let s = totalSeconds % 60;
             return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // 解析用戶輸入的配速格式 (支援 "5:30"、全形冒號 "5：30"、或純數字 "5.5")
+        function parsePaceInput(inputStr) {
+            if (!inputStr) return null;
+            let s = String(inputStr).trim().replace(/：/g, ':');
+            if (s.includes(':')) {
+                const parts = s.split(':');
+                const min = parseInt(parts[0], 10) || 0;
+                const sec = parseInt(parts[1], 10) || 0;
+                return (min * 60) + sec;
+            }
+            const num = parseFloat(s);
+            if (!isNaN(num)) {
+                if (num >= 100) { // 例: 530 -> 5 分 30 秒
+                    const min = Math.floor(num / 100);
+                    const sec = Math.round(num % 100);
+                    return (min * 60) + sec;
+                }
+                return Math.round(num * 60);
+            }
+            return null;
+        }
+
+        // 用戶直接在表格中修改配速時的雙向連動處理
+        function handlePaceInputChange(index, value) {
+            const newPaceSec = parsePaceInput(value);
+            const distance = parseFloat(document.getElementById('distance').value);
+            const h = parseInt(document.getElementById('hours').value) || 0;
+            const m = parseInt(document.getElementById('minutes').value) || 0;
+            const s = parseInt(document.getElementById('seconds').value) || 0;
+            const baselineTotalSeconds = (h * 3600) + (m * 60) + s;
+            
+            if (isNaN(distance) || distance <= 0 || baselineTotalSeconds <= 0) return;
+            
+            const baselinePaceSec = baselineTotalSeconds / distance;
+            
+            if (!newPaceSec || newPaceSec <= 0) {
+                showError("請輸入有效的配速格式 (例如 5:30)");
+                calculateSplits();
+                return;
+            }
+            
+            // 計算相對於基準配速的變異百分比
+            let val = ((newPaceSec / baselinePaceSec) - 1) * 100;
+            val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, Math.round(val)));
+            
+            paceVariations[index] = val;
+            
+            // 將策略標記為自訂
+            const strategySelect = document.getElementById('strategy');
+            let customOption = strategySelect.querySelector('option[value="custom"]');
+            if (!customOption) {
+                customOption = document.createElement('option');
+                customOption.value = "custom";
+                customOption.text = "自訂策略 (已由圖表/表格修改)";
+                customOption.hidden = true;
+                strategySelect.appendChild(customOption);
+            }
+            strategySelect.value = "custom";
+            
+            renderWaveform();
+            calculateSplits();
         }
 
         let paceVariations = []; 
@@ -746,8 +814,12 @@
                     <td class="px-6 py-3.5 whitespace-nowrap text-sm font-medium text-slate-500 font-mono">
                         <span class="text-xs text-slate-400 mr-1">km</span>${rowLabel}
                     </td>
-                    <td class="px-6 py-3.5 whitespace-nowrap text-center text-base ${paceColorClass} font-mono">
-                        ${formatPace(paceForThisSegment)}
+                    <td class="px-6 py-2 whitespace-nowrap text-center">
+                        <input type="text"
+                               value="${formatPace(paceForThisSegment)}"
+                               onchange="handlePaceInputChange(${i}, this.value)"
+                               class="w-20 text-center font-mono font-bold text-base ${paceColorClass} bg-slate-50/80 hover:bg-white focus:bg-white hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border border-slate-200 rounded-lg py-1 px-1 transition-all outline-none shadow-sm cursor-text"
+                               title="點擊可直接修改此段配速 (例如 5:30)">
                     </td>
                     <td class="px-6 py-3.5 whitespace-nowrap text-center text-sm text-slate-500 font-mono">
                         ${formatTime(segmentTime)}
