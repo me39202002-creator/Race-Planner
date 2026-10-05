@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
     <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png">
+    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -88,20 +88,42 @@
             <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <!-- Distance Input -->
-                <div>
-                    <label for="distance" class="block text-sm font-bold text-slate-700 mb-3">目標距離 (公里)</label>
-                    <div class="relative">
-                        <input type="number" id="distance" value="10" step="0.01" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
-                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                            <span class="text-slate-400 font-semibold">km</span>
+                <!-- Distance & Interval Input -->
+                <div class="space-y-4">
+                    <div>
+                        <label for="distance" class="block text-sm font-bold text-slate-700 mb-2">目標距離 (公里)</label>
+                        <div class="relative">
+                            <input type="number" id="distance" value="10" step="0.01" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <span class="text-slate-400 font-semibold">km</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 flex flex-wrap gap-2">
+                            <button onclick="setDistance(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">5K</button>
+                            <button onclick="setDistance(10)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">10K</button>
+                            <button onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
+                            <button onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
                         </div>
                     </div>
-                    <div class="mt-3 flex flex-wrap gap-2">
-                        <button onclick="setDistance(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">5K</button>
-                        <button onclick="setDistance(10)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">10K</button>
-                        <button onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
-                        <button onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
+
+                    <!-- 分段間隔設定 -->
+                    <div class="pt-2 border-t border-slate-100">
+                        <label for="split-interval" class="block text-sm font-bold text-slate-700 mb-2 flex items-center justify-between">
+                            <span>分段間隔 (公里)</span>
+                            <span class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="split-interval" value="1" step="0.5" min="1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                <span class="text-slate-400 font-semibold">km/段</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex flex-wrap gap-2">
+                            <button onclick="setIntervalVal(1)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 1 km</button>
+                            <button onclick="setIntervalVal(2)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2 km</button>
+                            <button onclick="setIntervalVal(2.5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2.5 km</button>
+                            <button onclick="setIntervalVal(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 5 km</button>
+                        </div>
                     </div>
                 </div>
 
@@ -251,11 +273,38 @@
             if(val === 42.195) setTime(4, 0, 0);
             updateBoardIfVisible();
         }
+
+        function setIntervalVal(val) {
+            document.getElementById('split-interval').value = val;
+            updateBoardIfVisible();
+        }
         
         function setTime(h, m, s) {
             document.getElementById('hours').value = h;
             document.getElementById('minutes').value = m;
             document.getElementById('seconds').value = s;
+        }
+
+        function getSegmentsInfo() {
+            const distance = parseFloat(document.getElementById('distance').value);
+            let interval = parseFloat(document.getElementById('split-interval').value);
+            if (isNaN(interval) || interval <= 0) interval = 1;
+            
+            const segments = [];
+            let covered = 0;
+            while (covered < distance) {
+                const remaining = distance - covered;
+                const segDist = Math.min(interval, remaining);
+                const startKm = covered;
+                const endKm = covered + segDist;
+                segments.push({
+                    startKm: startKm,
+                    endKm: endKm,
+                    dist: segDist
+                });
+                covered += segDist;
+            }
+            return { distance, interval, segments };
         }
         
         function updateBoardIfVisible() {
@@ -307,30 +356,30 @@
 
             if (document.getElementById('results-area').classList.contains('hidden')) return;
 
-            const distance = parseFloat(document.getElementById('distance').value);
-            const segments = Math.ceil(distance);
-            if (isNaN(distance) || distance <= 0) return;
+            const { distance, segments } = getSegmentsInfo();
+            const totalSegments = segments.length;
+            if (isNaN(distance) || distance <= 0 || totalSegments === 0) return;
 
-            if (paceVariations.length !== segments) {
-                paceVariations = new Array(segments).fill(0);
+            if (paceVariations.length !== totalSegments) {
+                paceVariations = new Array(totalSegments).fill(0);
             }
             if (strategy === 'custom') return;
 
             paceVariations = paceVariations.map(() => 0);
 
             if (strategy === 'conservative') {
-                const slowSegmentsCount = Math.floor(segments * 0.2) || 1;
+                const slowSegmentsCount = Math.floor(totalSegments * 0.2) || 1;
                 for (let i = 0; i < slowSegmentsCount; i++) paceVariations[i] = intensity;
-                const remainingSegments = segments - slowSegmentsCount;
+                const remainingSegments = totalSegments - slowSegmentsCount;
                 if (remainingSegments > 0) {
                     const totalCompensation = slowSegmentsCount * -intensity;
                     const compPerSegment = totalCompensation / remainingSegments;
-                    for (let i = slowSegmentsCount; i < segments; i++) paceVariations[i] = compPerSegment;
+                    for (let i = slowSegmentsCount; i < totalSegments; i++) paceVariations[i] = compPerSegment;
                 }
             } else if (strategy === 'negative') {
-                const phaseCount = Math.floor(segments * 0.3) || 1;
+                const phaseCount = Math.floor(totalSegments * 0.3) || 1;
                 for (let i = 0; i < phaseCount; i++) paceVariations[i] = intensity;
-                for (let i = segments - phaseCount; i < segments; i++) paceVariations[i] = -intensity;
+                for (let i = totalSegments - phaseCount; i < totalSegments; i++) paceVariations[i] = -intensity;
             }
 
             renderWaveform();
@@ -345,18 +394,21 @@
 
         function initCustomBoard() {
             const distance = parseFloat(document.getElementById('distance').value);
+            const interval = parseFloat(document.getElementById('split-interval').value);
             const h = parseInt(document.getElementById('hours').value) || 0;
             const m = parseInt(document.getElementById('minutes').value) || 0;
             const s = parseInt(document.getElementById('seconds').value) || 0;
             const totalSeconds = (h * 3600) + (m * 60) + s;
 
             if (isNaN(distance) || distance <= 0) { showError("請輸入大於 0 的有效距離！"); return; }
+            if (isNaN(interval) || interval <= 0) { showError("請輸入大於 0 的有效分段間隔！"); return; }
             if (totalSeconds <= 0) { showError("請輸入有效的基準目標時間！"); return; }
 
-            const segments = Math.ceil(distance);
+            const { segments } = getSegmentsInfo();
+            const totalSegments = segments.length;
             
-            if (paceVariations.length !== segments) {
-                paceVariations = new Array(segments).fill(0);
+            if (paceVariations.length !== totalSegments) {
+                paceVariations = new Array(totalSegments).fill(0);
                 const strategySelect = document.getElementById('strategy');
                 if (strategySelect.value === 'custom') strategySelect.value = 'even';
             }
@@ -467,13 +519,14 @@
             const kmLabel = document.getElementById('node-km');
             const valLabel = document.getElementById('node-val');
             
-            const distance = parseFloat(document.getElementById('distance').value);
-            let distLabel = (index === paceVariations.length - 1 && distance % 1 !== 0) ? 
-                            `最後 ${(distance % 1).toFixed(2)}km` : 
-                            `第 ${index + 1} km`;
+            const { segments } = getSegmentsInfo();
+            const seg = segments[index];
+            let distLabel = `第 ${index + 1} 段`;
+            if (seg) {
+                distLabel = `${seg.startKm.toFixed(seg.startKm % 1 === 0 ? 0 : 2)} ~ ${seg.endKm.toFixed(seg.endKm % 1 === 0 ? 0 : 2)} km`;
+            }
                             
             kmLabel.innerText = distLabel;
-            
             valLabel.innerText = `配速 ${formatPace(actualPaceSec)}`;
             
             if(val < 0) {
@@ -600,7 +653,8 @@
             const s = parseInt(document.getElementById('seconds').value) || 0;
             
             const baselineTotalSeconds = (h * 3600) + (m * 60) + s;
-            const segments = Math.ceil(distance);
+            const { segments } = getSegmentsInfo();
+            const totalSegments = segments.length;
             
             const baselinePaceSec = baselineTotalSeconds / distance;
             
@@ -618,9 +672,9 @@
             let calculatedTotalSeconds = 0;
             let segmentsData = [];
 
-            for (let i = 0; i < segments; i++) {
-                let sliderValue = paceVariations[i]; 
-                let segmentDist = (i === segments - 1 && distance % 1 !== 0) ? (distance % 1) : 1;
+            for (let i = 0; i < totalSegments; i++) {
+                let sliderValue = paceVariations[i] || 0; 
+                let segmentDist = segments[i].dist;
                 
                 let paceForThisSegment = baselinePaceSec * (1 + (sliderValue / 100));
                 let segmentTime = paceForThisSegment * segmentDist;
@@ -628,6 +682,8 @@
                 calculatedTotalSeconds += segmentTime;
                 
                 segmentsData.push({
+                    startKm: segments[i].startKm,
+                    endKm: segments[i].endKm,
                     dist: segmentDist,
                     pace: paceForThisSegment,
                     time: segmentTime
@@ -659,7 +715,6 @@
             tableBody.innerHTML = '';
             
             let cumulativeTime = 0;
-            let cumulativeDist = 0;
 
             for (let i = 0; i < segmentsData.length; i++) {
                 let segmentDist = segmentsData[i].dist;
@@ -667,11 +722,10 @@
                 let paceForThisSegment = segmentsData[i].pace;
                 
                 cumulativeTime += segmentTime;
-                cumulativeDist += segmentDist;
 
-                let rowLabel = (i === segmentsData.length - 1 && distance % 1 !== 0) ? 
-                               `${(cumulativeDist - segmentDist).toFixed(2)} ~ ${cumulativeDist.toFixed(2)}` : 
-                               `${i + 1}`;
+                let startFormatted = segmentsData[i].startKm.toFixed(segmentsData[i].startKm % 1 === 0 ? 0 : 2);
+                let endFormatted = segmentsData[i].endKm.toFixed(segmentsData[i].endKm % 1 === 0 ? 0 : 2);
+                let rowLabel = `${startFormatted} ~ ${endFormatted}`;
 
                 let paceColorClass = "text-slate-700 font-semibold";
                 let paceBg = "";
