@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>配速計算器 | Race Split Planner</title>
-    <!-- 圖示參照改為 PNG 格式 -->
-    <link rel="icon" type="image/png" href="race-planner-Icon.png?v=4">
-    <link rel="apple-touch-icon" href="race-planner-Icon.png?v=4">
+    <!-- 圖示參照 -->
+    <link rel="icon" type="image/png" href="race-planner-Icon.png">
+    <link rel="apple-touch-icon" href="race-planner-Icon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,16 +17,16 @@
             background-color: #f8fafc;
             -webkit-font-smoothing: antialiased;
         }
-        /* 自訂 Range Slider 樣式 */
+        /* 自訂 Range Slider 樣式 (包含 appearance 修正警告) */
         input[type=range] {
-            -webkit-appearance: none;
             appearance: none;
+            -webkit-appearance: none;
             width: 100%;
             background: transparent;
         }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
             appearance: none;
+            -webkit-appearance: none;
             height: 20px;
             width: 20px;
             border-radius: 50%;
@@ -71,19 +71,19 @@
         <!-- Header -->
         <div class="relative text-center pt-4 pb-2">
             <!-- 右上角版本資訊與中英文切換 -->
-            <div class="sm:absolute sm:right-0 sm:top-2 flex items-center justify-center sm:flex-col sm:items-end gap-2 text-xs text-slate-400 mb-3 sm:mb-0 select-none">
+            <div class="sm:absolute sm:right-0 sm:top-2 flex flex-row sm:flex-col items-center sm:items-end justify-center gap-3 sm:gap-2 text-xs text-slate-400 mb-3 sm:mb-0 select-none">
                 <!-- 語系切換按鈕 -->
                 <div class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200">
                     <button id="lang-btn-zh" onclick="setLanguage('zh')" class="px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all">中文</button>
                     <button id="lang-btn-en" onclick="setLanguage('en')" class="px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all">EN</button>
                 </div>
                 <!-- 版本與日期徽章 -->
-                <div class="flex items-center sm:flex-col sm:items-end gap-1.5">
+                <div class="flex items-center gap-1.5">
                     <span class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 px-2.5 py-1 rounded-full text-[11px] font-bold font-mono border border-slate-200 transition-colors shadow-xs">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        v2.2
+                        v2.5
                     </span>
-                    <span id="label-updated-date" class="text-[11px] font-mono text-slate-400">更新於 2026.10.05</span>
+                    <span id="label-updated-date" class="text-[11px] font-mono text-slate-400">更新於 2026.10.07</span>
                 </div>
             </div>
 
@@ -196,15 +196,50 @@
                 </div>
             </div>
 
-            <div class="mt-8">
-                <button id="btn-generate-plan" onclick="initCustomBoard()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
+            <!-- 主按鈕區塊 -->
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <button id="btn-generate-plan" onclick="initCustomBoard()" class="sm:col-span-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
                     <i class="fa-solid fa-wand-magic-sparkles"></i> <span>產生配速計畫表</span>
+                </button>
+                <button id="btn-toggle-checklist" onclick="toggleChecklist()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl shadow-sm hover:shadow hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg border border-slate-200">
+                    <i class="fa-solid fa-list-check text-emerald-600"></i> <span id="label-btn-checklist">賽前準備清單</span>
                 </button>
             </div>
         </div>
 
+        <!-- Checklist Area (Hidden by default) -->
+        <div id="checklist-area" class="hidden w-full bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8 relative overflow-hidden transition-all duration-500">
+            <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <div>
+                    <h3 id="label-checklist-title" class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-person-running text-emerald-500"></i>
+                        賽前裝備與準備清單
+                    </h3>
+                    <p id="label-checklist-desc" class="text-sm text-slate-500 mt-1">勾選狀態會自動儲存在此裝置中</p>
+                </div>
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                    <div class="flex-grow sm:flex-grow-0 flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
+                        <div class="w-full sm:w-32 h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div id="checklist-progress-bar" class="h-full bg-emerald-500 transition-all duration-500 w-0"></div>
+                        </div>
+                        <span id="checklist-progress-text" class="text-xs font-bold text-slate-600 font-mono w-9 text-right">0/0</span>
+                    </div>
+                    <button onclick="clearChecklist()" class="shrink-0 text-xs text-rose-600 hover:text-white border border-rose-200 hover:bg-rose-500 font-semibold px-3 py-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-trash-can"></i> <span id="label-btn-clear">清除</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Checklist Content (Generated by JS) -->
+            <div id="checklist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Checklist Categories will be injected here -->
+            </div>
+        </div>
+
         <!-- Results Area -->
-        <div id="results-area" class="hidden flex-col gap-6 items-stretch opacity-0 transition-opacity duration-500 w-full mt-8">
+        <div id="results-area" class="hidden flex-col gap-6 items-stretch opacity-0 transition-opacity duration-500 w-full mt-2">
             
             <!-- Strategies Panel (Top) -->
             <div class="w-full bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[400px]">
@@ -272,7 +307,7 @@
                                 <th id="th-segment" scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
                                 <th id="th-pace" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">
                                     <span>該段配速</span>
-                                    <span id="th-pace-sub" class="block text-[10px] text-blue-500 font-normal">可直接輸入修改 (分:秒)</span>
+                                    <span id="th-pace-sub" class="block text-[10px] text-blue-500 font-normal mt-0.5">可直接輸入修改 (分:秒)</span>
                                 </th>
                                 <th id="th-split-time" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
                                 <th id="th-cum-time" scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
@@ -291,10 +326,49 @@
     <script>
         let currentLang = 'zh';
 
+        // --- 賽前清單資料 ---
+        const checklistCategories = [
+            { id: 'apparel', zh: '服裝與穿戴', en: 'Apparel & Wearables' },
+            { id: 'nutrition', zh: '補給與營養', en: 'Nutrition & Hydration' },
+            { id: 'electronics', zh: '電子設備', en: 'Electronics' },
+            { id: 'misc', zh: '必備與其他', en: 'Essentials & Misc' }
+        ];
+
+        const checklistItems = {
+            apparel: [
+                { id: 'shoes', zh: '跑鞋 (已習慣的戰靴)', en: 'Running Shoes' },
+                { id: 'socks', zh: '運動襪 (防起水泡)', en: 'Running Socks' },
+                { id: 'shirt', zh: '排汗跑衣', en: 'Running Shirt' },
+                { id: 'shorts', zh: '跑褲 / 緊身褲', en: 'Running Shorts/Tights' },
+                { id: 'hat', zh: '帽子 / 空心帽', en: 'Hat / Visor' },
+                { id: 'sunglasses', zh: '運動太陽眼鏡', en: 'Sunglasses' }
+            ],
+            nutrition: [
+                { id: 'gels', zh: '能量膠 (依計畫數量)', en: 'Energy Gels' },
+                { id: 'salt', zh: '鹽錠 / 電解質', en: 'Salt Tabs / Electrolytes' },
+                { id: 'water', zh: '水壺 (如有需要)', en: 'Water Bottle' },
+                { id: 'breakfast', zh: '賽前早餐 (提早吃完)', en: 'Pre-race Breakfast' }
+            ],
+            electronics: [
+                { id: 'watch', zh: 'GPS 手錶 (充飽電)', en: 'GPS Watch (Charged)' },
+                { id: 'hrm', zh: '心率帶 (如有)', en: 'Heart Rate Monitor' },
+                { id: 'phone', zh: '手機', en: 'Smartphone' },
+                { id: 'earphones', zh: '藍牙耳機 (充飽電)', en: 'Earphones (Charged)' }
+            ],
+            misc: [
+                { id: 'bib', zh: '號碼布 & 別針/號碼帶', en: 'Race Bib & Pins/Belt' },
+                { id: 'chip', zh: '計時晶片', en: 'Timing Chip' },
+                { id: 'vaseline', zh: '防摩擦膏 / 凡士林', en: 'Anti-chafe Balm / Vaseline' },
+                { id: 'sunscreen', zh: '防曬乳', en: 'Sunscreen' },
+                { id: 'clothes', zh: '賽後毛巾與替換衣物', en: 'Post-race Towel & Clothes' }
+            ]
+        };
+
+        // --- 雙語字典 ---
         const i18n = {
             zh: {
                 pageTitle: "配速計算器 | Race Split Planner",
-                updatedDate: "更新於 2026.10.05",
+                updatedDate: "更新於 2026.10.07",
                 subtitle: "自訂每公里配速，精準規劃你的完賽策略",
                 targetDistance: "目標距離 (公里)",
                 halfMarathon: "半馬 (21K)",
@@ -336,11 +410,17 @@
                 errDist: "請輸入大於 0 的有效距離！",
                 errInterval: "請輸入大於 0 的有效分段間隔！",
                 errTime: "請輸入有效的基準目標時間！",
-                errPaceFormat: "請輸入有效的配速格式 (例如 5:30)"
+                errPaceFormat: "請輸入有效的配速格式 (例如 5:30)",
+                // Checklist
+                btnChecklist: "賽前準備清單",
+                checklistTitle: "賽前裝備與準備清單",
+                checklistDesc: "勾選狀態會自動儲存在此裝置中",
+                btnClearChecklist: "清除全部",
+                checklistConfirm: "確定要清除所有已勾選的項目嗎？"
             },
             en: {
                 pageTitle: "Race Split Planner | Pacing Calculator",
-                updatedDate: "Updated 2026.10.05",
+                updatedDate: "Updated 2026.10.07",
                 subtitle: "Customize splits per km to master your race strategy",
                 targetDistance: "Target Distance (km)",
                 halfMarathon: "Half (21.1K)",
@@ -382,7 +462,13 @@
                 errDist: "Please enter a valid distance greater than 0!",
                 errInterval: "Please enter a valid split interval greater than 0!",
                 errTime: "Please enter a valid baseline target time!",
-                errPaceFormat: "Please enter a valid pace format (e.g. 5:30)"
+                errPaceFormat: "Please enter a valid pace format (e.g. 5:30)",
+                // Checklist
+                btnChecklist: "Pre-Race Checklist",
+                checklistTitle: "Pre-Race Gear Checklist",
+                checklistDesc: "Progress is saved locally on your device.",
+                btnClearChecklist: "Clear All",
+                checklistConfirm: "Are you sure you want to clear all checked items?"
             }
         };
 
@@ -401,7 +487,7 @@
                 btnZh.className = "px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all";
             }
 
-            // 更新文字內容
+            // 更新主要文字內容
             document.title = t.pageTitle;
             document.getElementById('label-updated-date').innerText = t.updatedDate;
             document.getElementById('label-subtitle').innerText = t.subtitle;
@@ -441,10 +527,22 @@
             document.getElementById('th-split-time').innerText = t.thSplitTime;
             document.getElementById('th-cum-time').innerText = t.thCumTime;
 
+            // 更新清單文字
+            document.getElementById('label-btn-checklist').innerText = t.btnChecklist;
+            document.getElementById('label-checklist-title').innerHTML = `<i class="fa-solid fa-person-running text-emerald-500"></i> ${t.checklistTitle}`;
+            document.getElementById('label-checklist-desc').innerText = t.checklistDesc;
+            document.getElementById('label-btn-clear').innerText = t.btnClearChecklist;
+
+            // 若清單已開啟，重新渲染
+            if (!document.getElementById('checklist-area').classList.contains('hidden')) {
+                renderChecklist();
+            }
+
             // 重新刷新策略選單文字與計算表
             applyStrategy();
         }
 
+        // --- 輔助設定函數 ---
         function setDistance(val) {
             document.getElementById('distance').value = val;
             if(val === 5) setTime(0, 30, 0);
@@ -465,10 +563,11 @@
             document.getElementById('seconds').value = s;
         }
 
+        // 計算分段路程
         function getSegmentsInfo() {
             const distance = parseFloat(document.getElementById('distance').value);
             let interval = parseFloat(document.getElementById('split-interval').value);
-            if (isNaN(interval) || interval <= 0) interval = 1;
+            if (isNaN(interval) || interval <= 0) interval = 1; // 防呆
             
             const segments = [];
             let covered = 0;
@@ -501,6 +600,7 @@
             setTimeout(() => { errorBox.classList.add('hidden'); }, 4000);
         }
 
+        // 格式轉換
         function formatTime(totalSeconds) {
             totalSeconds = Math.round(totalSeconds); 
             let h = Math.floor(totalSeconds / 3600);
@@ -520,10 +620,10 @@
             return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
-        // 解析用戶輸入的配速格式 (支援 "5:30"、全形冒號 "5：30"、或純數字 "5.5")
+        // 解析用戶輸入的配速格式
         function parsePaceInput(inputStr) {
             if (!inputStr) return null;
-            let s = String(inputStr).trim().replace(/：/g, ':');
+            let s = String(inputStr).trim().replace(/：/g, ':'); // 容錯全形冒號
             if (s.includes(':')) {
                 const parts = s.split(':');
                 const min = parseInt(parts[0], 10) || 0;
@@ -532,16 +632,17 @@
             }
             const num = parseFloat(s);
             if (!isNaN(num)) {
-                if (num >= 100) {
+                if (num >= 100) { // 例如輸入 530 會被當成 5:30
                     const min = Math.floor(num / 100);
                     const sec = Math.round(num % 100);
                     return (min * 60) + sec;
                 }
-                return Math.round(num * 60);
+                return Math.round(num * 60); // 純分鐘數
             }
             return null;
         }
 
+        // 表格內直接修改配速
         function handlePaceInputChange(index, value) {
             const t = i18n[currentLang];
             const newPaceSec = parsePaceInput(value);
@@ -557,15 +658,17 @@
             
             if (!newPaceSec || newPaceSec <= 0) {
                 showError(t.errPaceFormat);
-                calculateSplits();
+                calculateSplits(); // 格式錯誤就回復原狀
                 return;
             }
             
+            // 根據新配速反推應有的變異百分比
             let val = ((newPaceSec / baselinePaceSec) - 1) * 100;
             val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, Math.round(val)));
             
             paceVariations[index] = val;
             
+            // 切換為自訂策略
             const strategySelect = document.getElementById('strategy');
             let customOption = strategySelect.querySelector('option[value="custom"]');
             if (!customOption) {
@@ -579,16 +682,19 @@
             }
             strategySelect.value = "custom";
             
+            // 重新繪圖與計算整體時間
             renderWaveform();
             calculateSplits();
         }
 
+        // --- 全局變數 ---
         let paceVariations = []; 
         let isDragging = false;
         let activePointIndex = -1;
-        let lockedPointIndex = -1; /* 新增這行：用來鎖定正在拖曳的節點 */
-        const MAX_VARIATION = 50; 
+        let lockedPointIndex = -1; 
+        const MAX_VARIATION = 50; // 改為 50%，讓配速調整範圍更大
 
+        // --- 主邏輯 ---
         function applyStrategy() {
             const t = i18n[currentLang];
             const strategySelect = document.getElementById('strategy');
@@ -687,25 +793,20 @@
                 return { x: clientX - rect.left, y: clientY - rect.top, width: rect.width, height: rect.height };
             };
 
-            /* 新增 isStart 參數，用來判斷現在是剛點擊還是正在拖曳 */
             const updatePoint = (e, isStart = false) => {
                 const pos = getRelativeCoordinates(e);
                 const svgW = 800, svgH = 280, pt = 40, pb = 40, pl = 24, pr = 24;
-                
-                // 先算出當下滑鼠在 SVG 裡面的絕對座標
                 const svgX = (pos.x / pos.width) * svgW;
                 const svgY = (pos.y / pos.height) * svgH;
-                
                 const segments = paceVariations.length;
                 let index;
 
-                /* 只有在「剛點擊」的瞬間，才根據 X 座標尋找最近的節點並鎖定 */
                 if (isStart) {
-                    // 【黃色區域限制】檢查點擊是否在圖表的有效網格內 (容許 15px 的手指觸控緩衝)
+                    // 邊界檢查 (Bounding Box Check) - 點出界則拒絕操作
                     const buffer = 15;
                     if (svgX < pl - buffer || svgX > (svgW - pr) + buffer || 
                         svgY < pt - buffer || svgY > (svgH - pb) + buffer) {
-                        return false; // 點擊在紅色的外部空白區，拒絕觸發修改
+                        return false; 
                     }
 
                     const usableSvgWidth = svgW - pl - pr;
@@ -716,7 +817,6 @@
                     if (segments === 1) index = 0;
                     lockedPointIndex = index;
                 } else {
-                    /* 拖曳過程中，強制更新被鎖定的節點，忽略滑鼠的水平偏移 */
                     index = lockedPointIndex;
                     if (index === -1) return false;
                 }
@@ -748,6 +848,7 @@
                 renderWaveform();
                 calculateSplits();
                 
+                // 計算當下的真實配速並傳遞給 tooltip
                 const distance = parseFloat(document.getElementById('distance').value);
                 const h = parseInt(document.getElementById('hours').value) || 0;
                 const m = parseInt(document.getElementById('minutes').value) || 0;
@@ -757,11 +858,10 @@
                 const actualPaceSec = baselinePaceSec * (1 + (val / 100));
                 
                 showTooltip(index, actualPaceSec, val);
-                return true; // 成功更新，回傳 true
+                return true;
             };
 
             const handleStart = (e) => {
-                // 只有當 updatePoint 回傳 true (點在黃色有效區域內) 時，才啟動拖曳狀態
                 if (updatePoint(e, true)) {
                     isDragging = true;
                     if(e.cancelable) e.preventDefault(); 
@@ -770,14 +870,14 @@
 
             const handleMove = (e) => {
                 if (!isDragging) return;
-                updatePoint(e, false); /* 傳入 false，代表這是移動過程 */
+                updatePoint(e, false); 
                 if(e.cancelable) e.preventDefault();
             };
 
             const handleEnd = () => {
                 isDragging = false;
                 activePointIndex = -1;
-                lockedPointIndex = -1; /* 結束拖曳時解除鎖定 */
+                lockedPointIndex = -1; 
                 renderWaveform(); 
                 hideTooltip();
             };
@@ -1044,6 +1144,83 @@
                 tableBody.appendChild(tr);
             }
         }
+
+        // --- 賽前清單核心邏輯 ---
+        function toggleChecklist() {
+            const area = document.getElementById('checklist-area');
+            if (area.classList.contains('hidden')) {
+                area.classList.remove('hidden');
+                renderChecklist();
+                setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            } else {
+                area.classList.add('hidden');
+            }
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist-container');
+            container.innerHTML = '';
+            let total = 0;
+            let checkedCount = 0;
+            const savedData = JSON.parse(localStorage.getItem('racePlannerChecklist') || '{}');
+
+            checklistCategories.forEach(cat => {
+                const catDiv = document.createElement('div');
+                catDiv.className = 'bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-emerald-100 transition-colors';
+                
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-slate-700 mb-3 text-sm border-b border-slate-200 pb-2';
+                title.innerText = cat[currentLang];
+                catDiv.appendChild(title);
+
+                const list = document.createElement('div');
+                list.className = 'space-y-2.5';
+
+                checklistItems[cat.id].forEach(item => {
+                    total++;
+                    const isChecked = savedData[item.id] || false;
+                    if (isChecked) checkedCount++;
+
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center gap-3 cursor-pointer group';
+                    label.innerHTML = `
+                        <div class="relative flex items-center justify-center w-5 h-5">
+                            <input type="checkbox" id="chk-${item.id}" ${isChecked ? 'checked' : ''} 
+                                onchange="updateChecklistStatus('${item.id}', this.checked)"
+                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded cursor-pointer checked:bg-emerald-500 checked:border-emerald-500 transition-all bg-white">
+                            <i class="fa-solid fa-check text-white text-[10px] absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                        </div>
+                        <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 peer-checked:text-slate-400 peer-checked:line-through transition-all select-none">
+                            ${item[currentLang]}
+                        </span>
+                    `;
+                    list.appendChild(label);
+                });
+                catDiv.appendChild(list);
+                container.appendChild(catDiv);
+            });
+
+            // 更新進度條
+            const pct = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
+            document.getElementById('checklist-progress-text').innerText = `${checkedCount}/${total}`;
+            document.getElementById('checklist-progress-bar').style.width = `${pct}%`;
+        }
+
+        function updateChecklistStatus(id, isChecked) {
+            const savedData = JSON.parse(localStorage.getItem('racePlannerChecklist') || '{}');
+            savedData[id] = isChecked;
+            localStorage.setItem('racePlannerChecklist', JSON.stringify(savedData));
+            renderChecklist(); // 重新渲染以更新進度條與刪除線
+        }
+
+        function clearChecklist() {
+            const t = i18n[currentLang];
+            if (confirm(t.checklistConfirm)) {
+                localStorage.removeItem('racePlannerChecklist');
+                renderChecklist();
+            }
+        }
+        // --- 賽前清單核心邏輯結束 ---
     </script>
 </body>
 </html>
