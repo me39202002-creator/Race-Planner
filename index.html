@@ -17,7 +17,7 @@
             background-color: #f8fafc;
             -webkit-font-smoothing: antialiased;
         }
-        /* 自訂 Range Slider 樣式 (包含 appearance 修正警告) */
+        /* 自訂 Range Slider 樣式 */
         input[type=range] {
             appearance: none;
             -webkit-appearance: none;
@@ -83,7 +83,7 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                         v2.5
                     </span>
-                    <span id="label-updated-date" class="text-[11px] font-mono text-slate-400">更新於 2026.10.07</span>
+                    <span id="label-updated-date" data-i18n="updatedDate" class="text-[11px] font-mono text-slate-400">更新於 2026.10.07</span>
                 </div>
             </div>
 
@@ -91,7 +91,7 @@
                 <i class="fa-solid fa-stopwatch text-blue-500"></i>
                 Race Split Planner
             </h1>
-            <p id="label-subtitle" class="mt-2 text-sm text-slate-500 font-medium">自訂每公里配速，精準規劃你的完賽策略</p>
+            <p id="label-subtitle" data-i18n="subtitle" class="mt-2 text-sm text-slate-500 font-medium">自訂每公里配速，精準規劃你的完賽策略</p>
         </div>
 
         <!-- Error Message Box -->
@@ -110,7 +110,7 @@
                 <!-- Distance & Interval Input -->
                 <div class="space-y-4">
                     <div>
-                        <label id="label-target-distance" for="distance" class="block text-sm font-bold text-slate-700 mb-2">目標距離 (公里)</label>
+                        <label id="label-target-distance" data-i18n="targetDistance" for="distance" class="block text-sm font-bold text-slate-700 mb-2">目標距離 (公里)</label>
                         <div class="relative">
                             <input type="number" id="distance" value="10" step="0.01" min="0.1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
@@ -120,28 +120,28 @@
                         <div class="mt-2.5 flex flex-wrap gap-2">
                             <button onclick="setDistance(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">5K</button>
                             <button onclick="setDistance(10)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">10K</button>
-                            <button id="btn-half-marathon" onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
-                            <button id="btn-full-marathon" onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
+                            <button id="btn-half-marathon" data-i18n="halfMarathon" onclick="setDistance(21.0975)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">半馬 (21K)</button>
+                            <button id="btn-full-marathon" data-i18n="fullMarathon" onclick="setDistance(42.195)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-blue-200">全馬 (42K)</button>
                         </div>
                     </div>
 
                     <!-- 分段間隔設定 -->
                     <div class="pt-2 border-t border-slate-100">
                         <label for="split-interval" class="block text-sm font-bold text-slate-700 mb-2 flex items-center justify-between">
-                            <span id="label-split-interval">分段間隔 (公里)</span>
-                            <span id="label-split-desc" class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
+                            <span id="label-split-interval" data-i18n="splitInterval">分段間隔 (公里)</span>
+                            <span id="label-split-desc" data-i18n="splitDesc" class="font-normal text-xs text-slate-400">依設定公里數劃分節點</span>
                         </label>
                         <div class="relative">
                             <input type="number" id="split-interval" value="1" step="0.5" min="1" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-2.5 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-lg font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                <span id="label-unit-interval" class="text-slate-400 font-semibold">km/段</span>
+                                <span id="label-unit-interval" data-i18n="unitInterval" class="text-slate-400 font-semibold">km/段</span>
                             </div>
                         </div>
                         <div class="mt-2 flex flex-wrap gap-2">
-                            <button id="btn-int-1" onclick="setIntervalVal(1)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 1 km</button>
-                            <button id="btn-int-2" onclick="setIntervalVal(2)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2 km</button>
-                            <button id="btn-int-25" onclick="setIntervalVal(2.5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2.5 km</button>
-                            <button id="btn-int-5" onclick="setIntervalVal(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 5 km</button>
+                            <button id="btn-int-1" data-i18n="int1" onclick="setIntervalVal(1)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 1 km</button>
+                            <button id="btn-int-2" data-i18n="int2" onclick="setIntervalVal(2)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2 km</button>
+                            <button id="btn-int-25" data-i18n="int25" onclick="setIntervalVal(2.5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 2.5 km</button>
+                            <button id="btn-int-5" data-i18n="int5" onclick="setIntervalVal(5)" class="text-xs font-semibold bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2.5 py-1 rounded-lg transition-colors border border-transparent hover:border-blue-200">每 5 km</button>
                         </div>
                     </div>
                 </div>
@@ -149,21 +149,21 @@
                 <!-- Time Input (基準時間) -->
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-3">
-                        <span id="label-target-time">基準目標時間</span>
-                        <span id="label-baseline-note" class="font-normal text-xs text-slate-400 ml-1">(圖表0%基準線)</span>
+                        <span id="label-target-time" data-i18n="targetTime">基準目標時間</span>
+                        <span id="label-baseline-note" data-i18n="baselineNote" class="font-normal text-xs text-slate-400 ml-1">(圖表0%基準線)</span>
                     </label>
                     <div class="grid grid-cols-3 gap-3">
                         <div class="relative group">
                             <input type="number" id="hours" value="1" min="0" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div id="unit-hours" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">時</div>
+                            <div id="unit-hours" data-i18n="unitHours" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">時</div>
                         </div>
                         <div class="relative group">
                             <input type="number" id="minutes" value="0" min="0" max="59" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div id="unit-minutes" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">分</div>
+                            <div id="unit-minutes" data-i18n="unitMinutes" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">分</div>
                         </div>
                         <div class="relative group">
                             <input type="number" id="seconds" value="0" min="0" max="59" onchange="updateBoardIfVisible()" class="block w-full rounded-xl border-slate-200 py-3 px-2 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none text-center text-xl font-bold font-mono transition-all">
-                            <div id="unit-seconds" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">秒</div>
+                            <div id="unit-seconds" data-i18n="unitSeconds" class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-white px-2 text-[11px] font-bold text-slate-400 rounded-full border border-slate-100">秒</div>
                         </div>
                     </div>
                 </div>
@@ -172,7 +172,7 @@
             <div class="mt-6 pt-6 border-t border-slate-100">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="sm:col-span-2">
-                        <label id="label-pacing-strategy" for="strategy" class="block text-sm font-bold text-slate-700 mb-3">配速策略</label>
+                        <label id="label-pacing-strategy" data-i18n="pacingStrategy" for="strategy" class="block text-sm font-bold text-slate-700 mb-3">配速策略</label>
                         <div class="relative">
                             <select id="strategy" onchange="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none appearance-none font-medium cursor-pointer transition-all">
                                 <option value="even">均速：全程使用相同跑動配速</option>
@@ -185,7 +185,7 @@
                         </div>
                     </div>
                     <div>
-                        <label id="label-intensity" for="strategy-intensity" class="block text-sm font-bold text-slate-700 mb-3">變化幅度 (%)</label>
+                        <label id="label-intensity" data-i18n="intensity" for="strategy-intensity" class="block text-sm font-bold text-slate-700 mb-3">變化幅度 (%)</label>
                         <div class="relative">
                             <input type="number" id="strategy-intensity" value="2" min="1" max="50" onchange="applyStrategy()" oninput="applyStrategy()" class="block w-full rounded-xl border-slate-200 py-3 px-4 text-slate-900 bg-slate-50 border focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-xl font-bold font-mono">
                             <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
@@ -199,10 +199,10 @@
             <!-- 主按鈕區塊 -->
             <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <button id="btn-generate-plan" onclick="initCustomBoard()" class="sm:col-span-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span>產生配速計畫表</span>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="generateBtn">產生配速計畫表</span>
                 </button>
                 <button id="btn-toggle-checklist" onclick="toggleChecklist()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl shadow-sm hover:shadow hover:-translate-y-0.5 transition-all duration-200 flex justify-center items-center gap-2 text-lg border border-slate-200">
-                    <i class="fa-solid fa-list-check text-emerald-600"></i> <span id="label-btn-checklist">賽前準備清單</span>
+                    <i class="fa-solid fa-list-check text-emerald-600"></i> <span id="label-btn-checklist" data-i18n="btnChecklist">賽前準備清單</span>
                 </button>
             </div>
         </div>
@@ -215,9 +215,9 @@
                 <div>
                     <h3 id="label-checklist-title" class="text-xl font-bold text-slate-800 flex items-center gap-2">
                         <i class="fa-solid fa-person-running text-emerald-500"></i>
-                        賽前裝備與準備清單
+                        <span data-i18n="checklistTitle">賽前裝備與準備清單</span>
                     </h3>
-                    <p id="label-checklist-desc" class="text-sm text-slate-500 mt-1">勾選狀態會自動儲存在此裝置中</p>
+                    <p id="label-checklist-desc" data-i18n="checklistDesc" class="text-sm text-slate-500 mt-1">勾選狀態會自動儲存在此裝置中</p>
                 </div>
                 <div class="flex items-center gap-4 w-full sm:w-auto">
                     <div class="flex-grow sm:flex-grow-0 flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
@@ -227,15 +227,13 @@
                         <span id="checklist-progress-text" class="text-xs font-bold text-slate-600 font-mono w-9 text-right">0/0</span>
                     </div>
                     <button onclick="clearChecklist()" class="shrink-0 text-xs text-rose-600 hover:text-white border border-rose-200 hover:bg-rose-500 font-semibold px-3 py-2 rounded-lg transition-colors flex items-center gap-1 shadow-sm">
-                        <i class="fa-solid fa-trash-can"></i> <span id="label-btn-clear">清除</span>
+                        <i class="fa-solid fa-trash-can"></i> <span id="label-btn-clear" data-i18n="btnClearChecklist">清除全部</span>
                     </button>
                 </div>
             </div>
             
             <!-- Checklist Content (Generated by JS) -->
-            <div id="checklist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Checklist Categories will be injected here -->
-            </div>
+            <div id="checklist-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
         </div>
 
         <!-- Results Area -->
@@ -247,12 +245,12 @@
                     <div>
                         <h3 id="label-chart-title" class="font-bold text-slate-800 text-base flex items-center gap-2">
                             <i class="fa-solid fa-chart-area text-blue-500"></i>
-                            策略波形圖
+                            <span data-i18n="chartTitle">策略波形圖</span>
                         </h3>
-                        <p id="label-chart-desc" class="text-xs text-slate-500 mt-1">在圖表上拖曳節點，繪製專屬配速曲線</p>
+                        <p id="label-chart-desc" data-i18n="chartDesc" class="text-xs text-slate-500 mt-1">在圖表上拖曳節點，繪製專屬配速曲線</p>
                     </div>
                     <button id="btn-reset-waveform" onclick="resetWaveform()" class="text-xs text-slate-600 hover:text-blue-700 font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-blue-50 transition-colors flex items-center gap-1 border border-transparent hover:border-blue-200">
-                        <i class="fa-solid fa-rotate-right"></i> <span>重置</span>
+                        <i class="fa-solid fa-rotate-right"></i> <span data-i18n="resetBtn">重置</span>
                     </button>
                 </div>
                 
@@ -265,9 +263,7 @@
                     </div>
 
                     <!-- 互動式 SVG 容器 -->
-                    <div id="waveform-container" class="w-full h-full relative cursor-crosshair touch-none px-12 sm:px-16">
-                        <!-- SVG 將由 JS 動態注入 -->
-                    </div>
+                    <div id="waveform-container" class="w-full h-full relative cursor-crosshair touch-none px-12 sm:px-16"></div>
 
                     <!-- 當前選中的節點資訊 Tooltip -->
                     <div id="active-node-info" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 shadow-xl border border-slate-700 rounded-full px-5 py-2.5 text-sm font-bold text-white opacity-0 transition-opacity duration-150 pointer-events-none flex items-center gap-2 z-20">
@@ -282,17 +278,17 @@
                 <!-- Summary Header (即時計算結果) -->
                 <div id="summary-header" class="bg-[#111827] text-white p-4 sm:p-6 grid grid-cols-3 divide-x divide-slate-700">
                     <div class="text-center px-1 sm:px-0">
-                        <div id="label-sum-dist" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">目標距離</div>
+                        <div id="label-sum-dist" data-i18n="sumDist" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2">目標距離</div>
                         <div class="flex items-baseline justify-center gap-1">
                             <div id="summary-distance" class="text-lg sm:text-3xl font-black text-white font-mono tracking-tight">--</div>
                         </div>
                     </div>
                     <div class="text-center px-1 sm:px-0">
-                        <div id="label-sum-time" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-blue-300">預估完賽時間</div>
+                        <div id="label-sum-time" data-i18n="sumTime" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-blue-300">預估完賽時間</div>
                         <div id="summary-time" class="text-lg sm:text-3xl font-black text-blue-400 font-mono tracking-tight transition-colors duration-300">--</div>
                     </div>
                     <div class="text-center px-1 sm:px-0">
-                        <div id="label-sum-pace" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-emerald-300">實質平均配速</div>
+                        <div id="label-sum-pace" data-i18n="sumPace" class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 sm:mb-2 text-emerald-300">實質平均配速</div>
                         <div class="flex items-baseline justify-center gap-1">
                             <div id="summary-pace" class="text-lg sm:text-3xl font-black text-emerald-400 font-mono tracking-tight transition-colors duration-300">--</div>
                         </div>
@@ -304,18 +300,16 @@
                     <table class="w-full text-sm text-left">
                         <thead class="text-xs text-slate-500 bg-white border-b border-slate-200">
                             <tr>
-                                <th id="th-segment" scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
+                                <th id="th-segment" data-i18n="thSegment" scope="col" class="px-6 py-5 font-bold whitespace-nowrap">路段 (KM)</th>
                                 <th id="th-pace" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">
-                                    <span>該段配速</span>
-                                    <span id="th-pace-sub" class="block text-[10px] text-blue-500 font-normal mt-0.5">可直接輸入修改 (分:秒)</span>
+                                    <span data-i18n="thPace">該段配速</span>
+                                    <span id="th-pace-sub" data-i18n="thPaceSub" class="block text-[10px] text-blue-500 font-normal mt-0.5">可直接輸入修改 (分:秒)</span>
                                 </th>
-                                <th id="th-split-time" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
-                                <th id="th-cum-time" scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
+                                <th id="th-split-time" data-i18n="thSplitTime" scope="col" class="px-6 py-5 font-bold text-center whitespace-nowrap">單段耗時</th>
+                                <th id="th-cum-time" data-i18n="thCumTime" scope="col" class="px-6 py-5 font-bold text-right whitespace-nowrap">累積時間</th>
                             </tr>
                         </thead>
-                        <tbody id="table-body" class="divide-y divide-slate-100 bg-white">
-                            <!-- Table rows will be injected here -->
-                        </tbody>
+                        <tbody id="table-body" class="divide-y divide-slate-100 bg-white"></tbody>
                     </table>
                 </div>
             </div>
@@ -323,904 +317,8 @@
         </div>
     </div>
 
-    <script>
-        let currentLang = 'zh';
-
-        // --- 賽前清單資料 ---
-        const checklistCategories = [
-            { id: 'apparel', zh: '服裝與穿戴', en: 'Apparel & Wearables' },
-            { id: 'nutrition', zh: '補給與營養', en: 'Nutrition & Hydration' },
-            { id: 'electronics', zh: '電子設備', en: 'Electronics' },
-            { id: 'misc', zh: '必備與其他', en: 'Essentials & Misc' }
-        ];
-
-        const checklistItems = {
-            apparel: [
-                { id: 'shoes', zh: '跑鞋 (已習慣的戰靴)', en: 'Running Shoes' },
-                { id: 'socks', zh: '運動襪 (防起水泡)', en: 'Running Socks' },
-                { id: 'shirt', zh: '排汗跑衣', en: 'Running Shirt' },
-                { id: 'shorts', zh: '跑褲 / 緊身褲', en: 'Running Shorts/Tights' },
-                { id: 'hat', zh: '帽子 / 空心帽', en: 'Hat / Visor' },
-                { id: 'sunglasses', zh: '運動太陽眼鏡', en: 'Sunglasses' }
-            ],
-            nutrition: [
-                { id: 'gels', zh: '能量膠 (依計畫數量)', en: 'Energy Gels' },
-                { id: 'salt', zh: '鹽錠 / 電解質', en: 'Salt Tabs / Electrolytes' },
-                { id: 'water', zh: '水壺 (如有需要)', en: 'Water Bottle' },
-                { id: 'breakfast', zh: '賽前早餐 (提早吃完)', en: 'Pre-race Breakfast' }
-            ],
-            electronics: [
-                { id: 'watch', zh: 'GPS 手錶 (充飽電)', en: 'GPS Watch (Charged)' },
-                { id: 'hrm', zh: '心率帶 (如有)', en: 'Heart Rate Monitor' },
-                { id: 'phone', zh: '手機', en: 'Smartphone' },
-                { id: 'earphones', zh: '藍牙耳機 (充飽電)', en: 'Earphones (Charged)' }
-            ],
-            misc: [
-                { id: 'bib', zh: '號碼布 & 別針/號碼帶', en: 'Race Bib & Pins/Belt' },
-                { id: 'chip', zh: '計時晶片', en: 'Timing Chip' },
-                { id: 'vaseline', zh: '防摩擦膏 / 凡士林', en: 'Anti-chafe Balm / Vaseline' },
-                { id: 'sunscreen', zh: '防曬乳', en: 'Sunscreen' },
-                { id: 'clothes', zh: '賽後毛巾與替換衣物', en: 'Post-race Towel & Clothes' }
-            ]
-        };
-
-        // --- 雙語字典 ---
-        const i18n = {
-            zh: {
-                pageTitle: "配速計算器 | Race Split Planner",
-                updatedDate: "更新於 2026.10.07",
-                subtitle: "自訂每公里配速，精準規劃你的完賽策略",
-                targetDistance: "目標距離 (公里)",
-                halfMarathon: "半馬 (21K)",
-                fullMarathon: "全馬 (42K)",
-                splitInterval: "分段間隔 (公里)",
-                splitDesc: "依設定公里數劃分節點",
-                unitInterval: "km/段",
-                int1: "每 1 km",
-                int2: "每 2 km",
-                int25: "每 2.5 km",
-                int5: "每 5 km",
-                targetTime: "基準目標時間",
-                baselineNote: "(圖表0%基準線)",
-                unitHours: "時",
-                unitMinutes: "分",
-                unitSeconds: "秒",
-                pacingStrategy: "配速策略",
-                intensity: "變化幅度 (%)",
-                evenOpt: "均速：全程使用相同跑動配速",
-                conservativeOpt: (pct) => `保守起跑：前 20% 慢 ${pct}%，再由後段逐步追回`,
-                negativeOpt: (pct) => `負分段：前 30% 慢 ${pct}%，後 30% 快 ${pct}%`,
-                customOptChart: "自訂策略 (已由圖表修改)",
-                customOptTable: "自訂策略 (已由圖表/表格修改)",
-                generateBtn: "產生配速計畫表",
-                chartTitle: "策略波形圖",
-                chartDesc: "在圖表上拖曳節點，繪製專屬配速曲線",
-                resetBtn: "重置",
-                sumDist: "目標距離",
-                sumTime: "預估完賽時間",
-                sumPace: "實質平均配速",
-                thSegment: "路段 (KM)",
-                thPace: "該段配速",
-                thPaceSub: "可直接輸入修改 (分:秒)",
-                thSplitTime: "單段耗時",
-                thCumTime: "累積時間",
-                tooltipPace: "配速",
-                segLabel: (idx) => `第 ${idx + 1} 段`,
-                inputTooltip: "點擊可直接修改此段配速 (例如 5:30)",
-                errDist: "請輸入大於 0 的有效距離！",
-                errInterval: "請輸入大於 0 的有效分段間隔！",
-                errTime: "請輸入有效的基準目標時間！",
-                errPaceFormat: "請輸入有效的配速格式 (例如 5:30)",
-                // Checklist
-                btnChecklist: "賽前準備清單",
-                checklistTitle: "賽前裝備與準備清單",
-                checklistDesc: "勾選狀態會自動儲存在此裝置中",
-                btnClearChecklist: "清除全部",
-                checklistConfirm: "確定要清除所有已勾選的項目嗎？"
-            },
-            en: {
-                pageTitle: "Race Split Planner | Pacing Calculator",
-                updatedDate: "Updated 2026.10.07",
-                subtitle: "Customize splits per km to master your race strategy",
-                targetDistance: "Target Distance (km)",
-                halfMarathon: "Half (21.1K)",
-                fullMarathon: "Full (42.2K)",
-                splitInterval: "Split Interval (km)",
-                splitDesc: "Segment distance for each node",
-                unitInterval: "km/split",
-                int1: "Every 1 km",
-                int2: "Every 2 km",
-                int25: "Every 2.5 km",
-                int5: "Every 5 km",
-                targetTime: "Baseline Target Time",
-                baselineNote: "(Chart 0% baseline)",
-                unitHours: "hr",
-                unitMinutes: "min",
-                unitSeconds: "sec",
-                pacingStrategy: "Pacing Strategy",
-                intensity: "Variation (%)",
-                evenOpt: "Even Split: Maintain uniform pace throughout",
-                conservativeOpt: (pct) => `Conservative: First 20% slower by ${pct}%, made up later`,
-                negativeOpt: (pct) => `Negative Split: First 30% +${pct}%, last 30% -${pct}%`,
-                customOptChart: "Custom (Adjusted via chart)",
-                customOptTable: "Custom (Adjusted via chart/table)",
-                generateBtn: "Generate Split Plan",
-                chartTitle: "Pacing Waveform",
-                chartDesc: "Drag points on chart to shape your pacing strategy",
-                resetBtn: "Reset",
-                sumDist: "TARGET DISTANCE",
-                sumTime: "PROJECTED FINISH TIME",
-                sumPace: "EFFECTIVE AVERAGE PACE",
-                thSegment: "Segment (KM)",
-                thPace: "Split Pace",
-                thPaceSub: "Editable (min:sec)",
-                thSplitTime: "Split Duration",
-                thCumTime: "Cumulative Time",
-                tooltipPace: "Pace",
-                segLabel: (idx) => `Split ${idx + 1}`,
-                inputTooltip: "Click to edit split pace (e.g. 5:30)",
-                errDist: "Please enter a valid distance greater than 0!",
-                errInterval: "Please enter a valid split interval greater than 0!",
-                errTime: "Please enter a valid baseline target time!",
-                errPaceFormat: "Please enter a valid pace format (e.g. 5:30)",
-                // Checklist
-                btnChecklist: "Pre-Race Checklist",
-                checklistTitle: "Pre-Race Gear Checklist",
-                checklistDesc: "Progress is saved locally on your device.",
-                btnClearChecklist: "Clear All",
-                checklistConfirm: "Are you sure you want to clear all checked items?"
-            }
-        };
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            const t = i18n[lang];
-
-            // 按鈕切換樣式
-            const btnZh = document.getElementById('lang-btn-zh');
-            const btnEn = document.getElementById('lang-btn-en');
-            if (lang === 'zh') {
-                btnZh.className = "px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all";
-                btnEn.className = "px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all";
-            } else {
-                btnEn.className = "px-2 py-0.5 rounded-md font-bold text-xs bg-white text-blue-600 shadow-xs transition-all";
-                btnZh.className = "px-2 py-0.5 rounded-md font-bold text-xs text-slate-500 hover:text-slate-800 transition-all";
-            }
-
-            // 更新主要文字內容
-            document.title = t.pageTitle;
-            document.getElementById('label-updated-date').innerText = t.updatedDate;
-            document.getElementById('label-subtitle').innerText = t.subtitle;
-            document.getElementById('label-target-distance').innerText = t.targetDistance;
-            document.getElementById('btn-half-marathon').innerText = t.halfMarathon;
-            document.getElementById('btn-full-marathon').innerText = t.fullMarathon;
-
-            document.getElementById('label-split-interval').innerText = t.splitInterval;
-            document.getElementById('label-split-desc').innerText = t.splitDesc;
-            document.getElementById('label-unit-interval').innerText = t.unitInterval;
-            document.getElementById('btn-int-1').innerText = t.int1;
-            document.getElementById('btn-int-2').innerText = t.int2;
-            document.getElementById('btn-int-25').innerText = t.int25;
-            document.getElementById('btn-int-5').innerText = t.int5;
-
-            document.getElementById('label-target-time').innerText = t.targetTime;
-            document.getElementById('label-baseline-note').innerText = t.baselineNote;
-            document.getElementById('unit-hours').innerText = t.unitHours;
-            document.getElementById('unit-minutes').innerText = t.unitMinutes;
-            document.getElementById('unit-seconds').innerText = t.unitSeconds;
-
-            document.getElementById('label-pacing-strategy').innerText = t.pacingStrategy;
-            document.getElementById('label-intensity').innerText = t.intensity;
-
-            document.getElementById('btn-generate-plan').querySelector('span').innerText = t.generateBtn;
-            document.getElementById('label-chart-title').innerHTML = `<i class="fa-solid fa-chart-area text-blue-500"></i> ${t.chartTitle}`;
-            document.getElementById('label-chart-desc').innerText = t.chartDesc;
-            document.getElementById('btn-reset-waveform').querySelector('span').innerText = t.resetBtn;
-
-            document.getElementById('label-sum-dist').innerText = t.sumDist;
-            document.getElementById('label-sum-time').innerText = t.sumTime;
-            document.getElementById('label-sum-pace').innerText = t.sumPace;
-
-            document.getElementById('th-segment').innerText = t.thSegment;
-            document.getElementById('th-pace').querySelector('span:first-child').innerText = t.thPace;
-            document.getElementById('th-pace-sub').innerText = t.thPaceSub;
-            document.getElementById('th-split-time').innerText = t.thSplitTime;
-            document.getElementById('th-cum-time').innerText = t.thCumTime;
-
-            // 更新清單文字
-            document.getElementById('label-btn-checklist').innerText = t.btnChecklist;
-            document.getElementById('label-checklist-title').innerHTML = `<i class="fa-solid fa-person-running text-emerald-500"></i> ${t.checklistTitle}`;
-            document.getElementById('label-checklist-desc').innerText = t.checklistDesc;
-            document.getElementById('label-btn-clear').innerText = t.btnClearChecklist;
-
-            // 若清單已開啟，重新渲染
-            if (!document.getElementById('checklist-area').classList.contains('hidden')) {
-                renderChecklist();
-            }
-
-            // 重新刷新策略選單文字與計算表
-            applyStrategy();
-        }
-
-        // --- 輔助設定函數 ---
-        function setDistance(val) {
-            document.getElementById('distance').value = val;
-            if(val === 5) setTime(0, 30, 0);
-            if(val === 10) setTime(1, 0, 0);
-            if(val === 21.0975) setTime(2, 0, 0);
-            if(val === 42.195) setTime(4, 0, 0);
-            updateBoardIfVisible();
-        }
-
-        function setIntervalVal(val) {
-            document.getElementById('split-interval').value = val;
-            updateBoardIfVisible();
-        }
-        
-        function setTime(h, m, s) {
-            document.getElementById('hours').value = h;
-            document.getElementById('minutes').value = m;
-            document.getElementById('seconds').value = s;
-        }
-
-        // 計算分段路程
-        function getSegmentsInfo() {
-            const distance = parseFloat(document.getElementById('distance').value);
-            let interval = parseFloat(document.getElementById('split-interval').value);
-            if (isNaN(interval) || interval <= 0) interval = 1; // 防呆
-            
-            const segments = [];
-            let covered = 0;
-            while (covered < distance) {
-                const remaining = distance - covered;
-                const segDist = Math.min(interval, remaining);
-                const startKm = covered;
-                const endKm = covered + segDist;
-                segments.push({
-                    startKm: startKm,
-                    endKm: endKm,
-                    dist: segDist
-                });
-                covered += segDist;
-            }
-            return { distance, interval, segments };
-        }
-        
-        function updateBoardIfVisible() {
-            const resultsArea = document.getElementById('results-area');
-            if (!resultsArea.classList.contains('hidden')) {
-                initCustomBoard();
-            }
-        }
-
-        function showError(message) {
-            const errorBox = document.getElementById('error-message');
-            document.getElementById('error-text').innerText = message;
-            errorBox.classList.remove('hidden');
-            setTimeout(() => { errorBox.classList.add('hidden'); }, 4000);
-        }
-
-        // 格式轉換
-        function formatTime(totalSeconds) {
-            totalSeconds = Math.round(totalSeconds); 
-            let h = Math.floor(totalSeconds / 3600);
-            let m = Math.floor((totalSeconds % 3600) / 60);
-            let s = totalSeconds % 60;
-            let timeStr = "";
-            if (h > 0) timeStr += h + ":";
-            timeStr += (m < 10 && h > 0 ? "0" : "") + m + ":";
-            timeStr += (s < 10 ? "0" : "") + s;
-            return timeStr;
-        }
-
-        function formatPace(totalSeconds) {
-            totalSeconds = Math.round(totalSeconds);
-            let m = Math.floor(totalSeconds / 60);
-            let s = totalSeconds % 60;
-            return `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-
-        // 解析用戶輸入的配速格式
-        function parsePaceInput(inputStr) {
-            if (!inputStr) return null;
-            let s = String(inputStr).trim().replace(/：/g, ':'); // 容錯全形冒號
-            if (s.includes(':')) {
-                const parts = s.split(':');
-                const min = parseInt(parts[0], 10) || 0;
-                const sec = parseInt(parts[1], 10) || 0;
-                return (min * 60) + sec;
-            }
-            const num = parseFloat(s);
-            if (!isNaN(num)) {
-                if (num >= 100) { // 例如輸入 530 會被當成 5:30
-                    const min = Math.floor(num / 100);
-                    const sec = Math.round(num % 100);
-                    return (min * 60) + sec;
-                }
-                return Math.round(num * 60); // 純分鐘數
-            }
-            return null;
-        }
-
-        // 表格內直接修改配速
-        function handlePaceInputChange(index, value) {
-            const t = i18n[currentLang];
-            const newPaceSec = parsePaceInput(value);
-            const distance = parseFloat(document.getElementById('distance').value);
-            const h = parseInt(document.getElementById('hours').value) || 0;
-            const m = parseInt(document.getElementById('minutes').value) || 0;
-            const s = parseInt(document.getElementById('seconds').value) || 0;
-            const baselineTotalSeconds = (h * 3600) + (m * 60) + s;
-            
-            if (isNaN(distance) || distance <= 0 || baselineTotalSeconds <= 0) return;
-            
-            const baselinePaceSec = baselineTotalSeconds / distance;
-            
-            if (!newPaceSec || newPaceSec <= 0) {
-                showError(t.errPaceFormat);
-                calculateSplits(); // 格式錯誤就回復原狀
-                return;
-            }
-            
-            // 根據新配速反推應有的變異百分比
-            let val = ((newPaceSec / baselinePaceSec) - 1) * 100;
-            val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, Math.round(val)));
-            
-            paceVariations[index] = val;
-            
-            // 切換為自訂策略
-            const strategySelect = document.getElementById('strategy');
-            let customOption = strategySelect.querySelector('option[value="custom"]');
-            if (!customOption) {
-                customOption = document.createElement('option');
-                customOption.value = "custom";
-                customOption.text = t.customOptTable;
-                customOption.hidden = true;
-                strategySelect.appendChild(customOption);
-            } else {
-                customOption.text = t.customOptTable;
-            }
-            strategySelect.value = "custom";
-            
-            // 重新繪圖與計算整體時間
-            renderWaveform();
-            calculateSplits();
-        }
-
-        // --- 全局變數 ---
-        let paceVariations = []; 
-        let isDragging = false;
-        let activePointIndex = -1;
-        let lockedPointIndex = -1; 
-        const MAX_VARIATION = 50; // 改為 50%，讓配速調整範圍更大
-
-        // --- 主邏輯 ---
-        function applyStrategy() {
-            const t = i18n[currentLang];
-            const strategySelect = document.getElementById('strategy');
-            const strategy = strategySelect.value;
-            const intensity = parseFloat(document.getElementById('strategy-intensity').value) || 2;
-            
-            const evenOpt = strategySelect.querySelector('option[value="even"]');
-            const conservativeOpt = strategySelect.querySelector('option[value="conservative"]');
-            const negativeOpt = strategySelect.querySelector('option[value="negative"]');
-            const customOpt = strategySelect.querySelector('option[value="custom"]');
-
-            if (evenOpt) evenOpt.innerText = t.evenOpt;
-            if (conservativeOpt) conservativeOpt.innerText = t.conservativeOpt(intensity);
-            if (negativeOpt) negativeOpt.innerText = t.negativeOpt(intensity);
-            if (customOpt) customOpt.innerText = t.customOptChart;
-
-            if (document.getElementById('results-area').classList.contains('hidden')) return;
-
-            const { distance, segments } = getSegmentsInfo();
-            const totalSegments = segments.length;
-            if (isNaN(distance) || distance <= 0 || totalSegments === 0) return;
-
-            if (paceVariations.length !== totalSegments) {
-                paceVariations = new Array(totalSegments).fill(0);
-            }
-            if (strategy === 'custom') return;
-
-            paceVariations = paceVariations.map(() => 0);
-
-            if (strategy === 'conservative') {
-                const slowSegmentsCount = Math.floor(totalSegments * 0.2) || 1;
-                for (let i = 0; i < slowSegmentsCount; i++) paceVariations[i] = intensity;
-                const remainingSegments = totalSegments - slowSegmentsCount;
-                if (remainingSegments > 0) {
-                    const totalCompensation = slowSegmentsCount * -intensity;
-                    const compPerSegment = totalCompensation / remainingSegments;
-                    for (let i = slowSegmentsCount; i < totalSegments; i++) paceVariations[i] = compPerSegment;
-                }
-            } else if (strategy === 'negative') {
-                const phaseCount = Math.floor(totalSegments * 0.3) || 1;
-                for (let i = 0; i < phaseCount; i++) paceVariations[i] = intensity;
-                for (let i = totalSegments - phaseCount; i < totalSegments; i++) paceVariations[i] = -intensity;
-            }
-
-            renderWaveform();
-            calculateSplits();
-        }
-
-        function resetWaveform() {
-            paceVariations = paceVariations.map(() => 0);
-            renderWaveform();
-            calculateSplits();
-        }
-
-        function initCustomBoard() {
-            const t = i18n[currentLang];
-            const distance = parseFloat(document.getElementById('distance').value);
-            const interval = parseFloat(document.getElementById('split-interval').value);
-            const h = parseInt(document.getElementById('hours').value) || 0;
-            const m = parseInt(document.getElementById('minutes').value) || 0;
-            const s = parseInt(document.getElementById('seconds').value) || 0;
-            const totalSeconds = (h * 3600) + (m * 60) + s;
-
-            if (isNaN(distance) || distance <= 0) { showError(t.errDist); return; }
-            if (isNaN(interval) || interval <= 0) { showError(t.errInterval); return; }
-            if (totalSeconds <= 0) { showError(t.errTime); return; }
-
-            const { segments } = getSegmentsInfo();
-            const totalSegments = segments.length;
-            
-            if (paceVariations.length !== totalSegments) {
-                paceVariations = new Array(totalSegments).fill(0);
-                const strategySelect = document.getElementById('strategy');
-                if (strategySelect.value === 'custom') strategySelect.value = 'even';
-            }
-
-            const resultsArea = document.getElementById('results-area');
-            resultsArea.classList.remove('hidden');
-            void resultsArea.offsetWidth;
-            resultsArea.classList.add('grid', 'opacity-100');
-            setTimeout(() => { resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-
-            initWaveformEvents();
-            applyStrategy(); 
-        }
-
-        function initWaveformEvents() {
-            const container = document.getElementById('waveform-container');
-            if (container.dataset.initialized) return;
-
-            const getRelativeCoordinates = (e) => {
-                const svgElement = container.querySelector('svg');
-                const rect = svgElement ? svgElement.getBoundingClientRect() : container.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                return { x: clientX - rect.left, y: clientY - rect.top, width: rect.width, height: rect.height };
-            };
-
-            const updatePoint = (e, isStart = false) => {
-                const pos = getRelativeCoordinates(e);
-                const svgW = 800, svgH = 280, pt = 40, pb = 40, pl = 24, pr = 24;
-                const svgX = (pos.x / pos.width) * svgW;
-                const svgY = (pos.y / pos.height) * svgH;
-                const segments = paceVariations.length;
-                let index;
-
-                if (isStart) {
-                    // 邊界檢查 (Bounding Box Check) - 點出界則拒絕操作
-                    const buffer = 15;
-                    if (svgX < pl - buffer || svgX > (svgW - pr) + buffer || 
-                        svgY < pt - buffer || svgY > (svgH - pb) + buffer) {
-                        return false; 
-                    }
-
-                    const usableSvgWidth = svgW - pl - pr;
-                    let percentX = usableSvgWidth > 0 ? (svgX - pl) / usableSvgWidth : 0;
-                    percentX = Math.max(0, Math.min(1, percentX));
-                    
-                    index = Math.round(percentX * (segments - 1));
-                    if (segments === 1) index = 0;
-                    lockedPointIndex = index;
-                } else {
-                    index = lockedPointIndex;
-                    if (index === -1) return false;
-                }
-                
-                const usableSvgHeight = svgH - pt - pb;
-                const centerY = pt + (usableSvgHeight / 2);
-                
-                let rawVal = ((svgY - centerY) / (usableSvgHeight / 2)) * MAX_VARIATION;
-                let val = Math.round(rawVal);
-                val = Math.max(-MAX_VARIATION, Math.min(MAX_VARIATION, val));
-                
-                activePointIndex = index;
-                paceVariations[index] = val;
-                
-                const strategySelect = document.getElementById('strategy');
-                const t = i18n[currentLang];
-                let customOption = strategySelect.querySelector('option[value="custom"]');
-                if (!customOption) {
-                    customOption = document.createElement('option');
-                    customOption.value = "custom";
-                    customOption.text = t.customOptChart;
-                    customOption.hidden = true;
-                    strategySelect.appendChild(customOption);
-                } else {
-                    customOption.text = t.customOptChart;
-                }
-                strategySelect.value = "custom";
-                
-                renderWaveform();
-                calculateSplits();
-                
-                // 計算當下的真實配速並傳遞給 tooltip
-                const distance = parseFloat(document.getElementById('distance').value);
-                const h = parseInt(document.getElementById('hours').value) || 0;
-                const m = parseInt(document.getElementById('minutes').value) || 0;
-                const s = parseInt(document.getElementById('seconds').value) || 0;
-                const totalSeconds = (h * 3600) + (m * 60) + s;
-                const baselinePaceSec = totalSeconds / distance;
-                const actualPaceSec = baselinePaceSec * (1 + (val / 100));
-                
-                showTooltip(index, actualPaceSec, val);
-                return true;
-            };
-
-            const handleStart = (e) => {
-                if (updatePoint(e, true)) {
-                    isDragging = true;
-                    if(e.cancelable) e.preventDefault(); 
-                }
-            };
-
-            const handleMove = (e) => {
-                if (!isDragging) return;
-                updatePoint(e, false); 
-                if(e.cancelable) e.preventDefault();
-            };
-
-            const handleEnd = () => {
-                isDragging = false;
-                activePointIndex = -1;
-                lockedPointIndex = -1; 
-                renderWaveform(); 
-                hideTooltip();
-            };
-
-            container.addEventListener('mousedown', handleStart);
-            container.addEventListener('mousemove', handleMove);
-            window.addEventListener('mouseup', handleEnd);
-
-            container.addEventListener('touchstart', handleStart, { passive: false });
-            container.addEventListener('touchmove', handleMove, { passive: false });
-            window.addEventListener('touchend', handleEnd);
-
-            container.dataset.initialized = 'true';
-        }
-
-        function showTooltip(index, actualPaceSec, val) {
-            const tooltip = document.getElementById('active-node-info');
-            const kmLabel = document.getElementById('node-km');
-            const valLabel = document.getElementById('node-val');
-            const t = i18n[currentLang];
-            
-            const { segments } = getSegmentsInfo();
-            const seg = segments[index];
-            let distLabel = t.segLabel(index);
-            if (seg) {
-                distLabel = `${seg.startKm.toFixed(seg.startKm % 1 === 0 ? 0 : 2)} ~ ${seg.endKm.toFixed(seg.endKm % 1 === 0 ? 0 : 2)} km`;
-            }
-                            
-            kmLabel.innerText = distLabel;
-            valLabel.innerText = `${t.tooltipPace} ${formatPace(actualPaceSec)}`;
-            
-            if(val < 0) {
-                valLabel.className = 'text-emerald-400 font-mono tracking-tight';
-            } else if (val > 0) {
-                valLabel.className = 'text-rose-400 font-mono tracking-tight';
-            } else {
-                valLabel.className = 'text-slate-300 font-mono tracking-tight';
-            }
-            
-            tooltip.style.opacity = '1';
-        }
-
-        function hideTooltip() {
-            document.getElementById('active-node-info').style.opacity = '0';
-        }
-
-        function renderWaveform() {
-            const container = document.getElementById('waveform-container');
-            if(!container) return;
-            
-            const svgW = 800;
-            const svgH = 280;
-            const pt = 40, pb = 40, pl = 24, pr = 24; 
-            
-            const segments = paceVariations.length;
-            
-            const getX = (i) => pl + (segments > 1 ? (i / (segments - 1)) * (svgW - pl - pr) : (svgW - pl - pr) / 2);
-            const getY = (val) => pt + ((val + MAX_VARIATION) / (MAX_VARIATION * 2)) * (svgH - pt - pb);
-
-            const points = [];
-            let pointsHtml = '';
-            for(let i = 0; i < segments; i++) {
-                const x = getX(i);
-                const y = getY(paceVariations[i]);
-                points.push({x, y});
-                
-                const isActive = i === activePointIndex;
-                const r = isActive ? 12 : 7;
-                const fill = isActive ? '#3b82f6' : '#ffffff';
-                const strokeWidth = isActive ? 4 : 3;
-                const shadow = isActive ? `<circle cx="${x}" cy="${y}" r="20" fill="#3b82f6" opacity="0.2"/>` : '';
-                
-                pointsHtml += `
-                    ${shadow}
-                    <circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="#3b82f6" stroke-width="${strokeWidth}" style="transition: all 0.1s ease-out;"/>
-                `;
-            }
-
-            let linePath = '';
-            if (points.length > 0) {
-                linePath += `M ${points[0].x} ${points[0].y}`;
-                const smoothing = 0.2; 
-                
-                const getControlPoint = (current, previous, next, reverse) => {
-                    const p = previous || current;
-                    const n = next || current;
-                    const lengthX = n.x - p.x;
-                    let lengthY = n.y - p.y;
-                    
-                    const slope1 = current.y - p.y;
-                    const slope2 = n.y - current.y;
-                    if (slope1 * slope2 <= 0) {
-                        lengthY = 0; 
-                    }
-
-                    const angle = Math.atan2(lengthY, lengthX) + (reverse ? Math.PI : 0);
-                    const length = Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)) * smoothing;
-                    return {
-                        x: current.x + Math.cos(angle) * length,
-                        y: current.y + Math.sin(angle) * length
-                    };
-                };
-
-                for (let i = 1; i < points.length; i++) {
-                    const point = points[i];
-                    const cps = getControlPoint(points[i - 1], points[i - 2], point, false); 
-                    const cpe = getControlPoint(point, points[i - 1], points[i + 1], true);  
-                    linePath += ` C ${cps.x},${cps.y} ${cpe.x},${cpe.y} ${point.x},${point.y}`;
-                }
-            }
-
-            let areaPath = linePath;
-            if (segments > 0) {
-                areaPath += ` L ${getX(segments - 1)} ${svgH - pb + 20} L ${getX(0)} ${svgH - pb + 20} Z`;
-            }
-
-            const y0 = getY(-MAX_VARIATION);
-            const y15_f = getY(-MAX_VARIATION/2);
-            const yCenter = getY(0);
-            const y15_s = getY(MAX_VARIATION/2);
-            const yMax = getY(MAX_VARIATION);
-
-            const svgContent = `
-                <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-full overflow-visible drop-shadow-sm" preserveAspectRatio="none">
-                    <defs>
-                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25"/>
-                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"/>
-                        </linearGradient>
-                    </defs>
-
-                    <line x1="${pl}" y1="${y0}" x2="${svgW-pr}" y2="${y0}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="6 6" />
-                    <line x1="${pl}" y1="${y15_f}" x2="${svgW-pr}" y2="${y15_f}" stroke="#f1f5f9" stroke-width="1" />
-                    <line x1="${pl}" y1="${yCenter}" x2="${svgW-pr}" y2="${yCenter}" stroke="#94a3b8" stroke-width="2" />
-                    <line x1="${pl}" y1="${y15_s}" x2="${svgW-pr}" y2="${y15_s}" stroke="#f1f5f9" stroke-width="1" />
-                    <line x1="${pl}" y1="${yMax}" x2="${svgW-pr}" y2="${yMax}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="6 6" />
-                    
-                    <path d="${areaPath}" fill="url(#areaGradient)" />
-                    
-                    <path d="${linePath}" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" />
-                    
-                    ${pointsHtml}
-                </svg>
-            `;
-            
-            container.innerHTML = svgContent;
-        }
-
-        function calculateSplits() {
-            const distance = parseFloat(document.getElementById('distance').value);
-            const h = parseInt(document.getElementById('hours').value) || 0;
-            const m = parseInt(document.getElementById('minutes').value) || 0;
-            const s = parseInt(document.getElementById('seconds').value) || 0;
-            
-            const baselineTotalSeconds = (h * 3600) + (m * 60) + s;
-            const { segments } = getSegmentsInfo();
-            const totalSegments = segments.length;
-            
-            const baselinePaceSec = baselineTotalSeconds / distance;
-            
-            const yAxisFast = document.getElementById('y-axis-fast');
-            const yAxisEven = document.getElementById('y-axis-even');
-            const yAxisSlow = document.getElementById('y-axis-slow');
-            if (yAxisFast && yAxisEven && yAxisSlow) {
-                const fastPaceSec = baselinePaceSec * (1 - (MAX_VARIATION / 100));
-                const slowPaceSec = baselinePaceSec * (1 + (MAX_VARIATION / 100));
-                yAxisFast.innerHTML = `<i class="fa-solid fa-rabbit mb-1"></i>${formatPace(fastPaceSec)}`;
-                yAxisEven.innerHTML = `<span class="bg-slate-50/80 px-1 rounded">${formatPace(baselinePaceSec)}</span>`;
-                yAxisSlow.innerHTML = `${formatPace(slowPaceSec)}<i class="fa-solid fa-turtle mt-1"></i>`;
-            }
-
-            let calculatedTotalSeconds = 0;
-            let segmentsData = [];
-
-            for (let i = 0; i < totalSegments; i++) {
-                let sliderValue = paceVariations[i] || 0; 
-                let segmentDist = segments[i].dist;
-                
-                let paceForThisSegment = baselinePaceSec * (1 + (sliderValue / 100));
-                let segmentTime = paceForThisSegment * segmentDist;
-                
-                calculatedTotalSeconds += segmentTime;
-                
-                segmentsData.push({
-                    startKm: segments[i].startKm,
-                    endKm: segments[i].endKm,
-                    dist: segmentDist,
-                    pace: paceForThisSegment,
-                    time: segmentTime
-                });
-            }
-
-            const calculatedAvgPaceSec = calculatedTotalSeconds / distance;
-
-            document.getElementById('summary-distance').innerText = `${distance.toFixed(2)} km`;
-            
-            const timeEl = document.getElementById('summary-time');
-            const paceEl = document.getElementById('summary-pace');
-            
-            timeEl.innerText = formatTime(calculatedTotalSeconds);
-            paceEl.innerText = `${formatPace(calculatedAvgPaceSec)}`;
-            
-            if(calculatedTotalSeconds < baselineTotalSeconds - 10) {
-                timeEl.className = "text-lg sm:text-3xl font-black text-emerald-400 font-mono tracking-tight transition-colors duration-300";
-                paceEl.className = "text-lg sm:text-3xl font-black text-emerald-400 font-mono tracking-tight transition-colors duration-300";
-            } else if (calculatedTotalSeconds > baselineTotalSeconds + 10) {
-                timeEl.className = "text-lg sm:text-3xl font-black text-rose-400 font-mono tracking-tight transition-colors duration-300";
-                paceEl.className = "text-lg sm:text-3xl font-black text-rose-400 font-mono tracking-tight transition-colors duration-300";
-            } else {
-                timeEl.className = "text-lg sm:text-3xl font-black text-blue-400 font-mono tracking-tight transition-colors duration-300";
-                paceEl.className = "text-lg sm:text-3xl font-black text-blue-400 font-mono tracking-tight transition-colors duration-300";
-            }
-
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-            
-            let cumulativeTime = 0;
-            const t = i18n[currentLang];
-
-            for (let i = 0; i < segmentsData.length; i++) {
-                let segmentDist = segmentsData[i].dist;
-                let segmentTime = segmentsData[i].time;
-                let paceForThisSegment = segmentsData[i].pace;
-                
-                cumulativeTime += segmentTime;
-
-                let startFormatted = segmentsData[i].startKm.toFixed(segmentsData[i].startKm % 1 === 0 ? 0 : 2);
-                let endFormatted = segmentsData[i].endKm.toFixed(segmentsData[i].endKm % 1 === 0 ? 0 : 2);
-                let rowLabel = `${startFormatted} ~ ${endFormatted}`;
-
-                let paceColorClass = "text-slate-700 font-semibold";
-                let paceBg = "";
-                if (paceForThisSegment < baselinePaceSec - 1) { 
-                    paceColorClass = "text-emerald-600 font-bold"; 
-                    paceBg = "bg-emerald-50/50";
-                }
-                if (paceForThisSegment > baselinePaceSec + 1) {
-                    paceColorClass = "text-rose-600 font-bold";
-                    paceBg = "bg-rose-50/50";
-                }
-                
-                if (i === activePointIndex) paceBg = "bg-blue-100/50 ring-inset ring-2 ring-blue-500/20";
-
-                const tr = document.createElement('tr');
-                tr.className = `hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${paceBg}`;
-                tr.innerHTML = `
-                    <td class="px-6 py-3.5 whitespace-nowrap text-sm font-medium text-slate-500 font-mono">
-                        <span class="text-xs text-slate-400 mr-1">km</span>${rowLabel}
-                    </td>
-                    <td class="px-6 py-2 whitespace-nowrap text-center">
-                        <input type="text"
-                               value="${formatPace(paceForThisSegment)}"
-                               onchange="handlePaceInputChange(${i}, this.value)"
-                               class="w-20 text-center font-mono font-bold text-base ${paceColorClass} bg-slate-50/80 hover:bg-white focus:bg-white hover:border-blue-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border border-slate-200 rounded-lg py-1 px-1 transition-all outline-none shadow-sm cursor-text"
-                               title="${t.inputTooltip}">
-                    </td>
-                    <td class="px-6 py-3.5 whitespace-nowrap text-center text-sm text-slate-500 font-mono">
-                        ${formatTime(segmentTime)}
-                    </td>
-                    <td class="px-6 py-3.5 whitespace-nowrap text-right font-bold text-slate-800 font-mono">
-                        ${formatTime(cumulativeTime)}
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            }
-        }
-
-        // --- 賽前清單核心邏輯 ---
-        function toggleChecklist() {
-            const area = document.getElementById('checklist-area');
-            if (area.classList.contains('hidden')) {
-                area.classList.remove('hidden');
-                renderChecklist();
-                setTimeout(() => { area.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-            } else {
-                area.classList.add('hidden');
-            }
-        }
-
-        function renderChecklist() {
-            const container = document.getElementById('checklist-container');
-            container.innerHTML = '';
-            let total = 0;
-            let checkedCount = 0;
-            const savedData = JSON.parse(localStorage.getItem('racePlannerChecklist') || '{}');
-
-            checklistCategories.forEach(cat => {
-                const catDiv = document.createElement('div');
-                catDiv.className = 'bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-emerald-100 transition-colors';
-                
-                const title = document.createElement('h4');
-                title.className = 'font-bold text-slate-700 mb-3 text-sm border-b border-slate-200 pb-2';
-                title.innerText = cat[currentLang];
-                catDiv.appendChild(title);
-
-                const list = document.createElement('div');
-                list.className = 'space-y-2.5';
-
-                checklistItems[cat.id].forEach(item => {
-                    total++;
-                    const isChecked = savedData[item.id] || false;
-                    if (isChecked) checkedCount++;
-
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center gap-3 cursor-pointer group';
-                    label.innerHTML = `
-                        <div class="relative flex items-center justify-center w-5 h-5">
-                            <input type="checkbox" id="chk-${item.id}" ${isChecked ? 'checked' : ''} 
-                                onchange="updateChecklistStatus('${item.id}', this.checked)"
-                                class="peer appearance-none w-5 h-5 border-2 border-slate-300 rounded cursor-pointer checked:bg-emerald-500 checked:border-emerald-500 transition-all bg-white">
-                            <i class="fa-solid fa-check text-white text-[10px] absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                        </div>
-                        <span class="text-sm font-medium text-slate-600 group-hover:text-slate-900 peer-checked:text-slate-400 peer-checked:line-through transition-all select-none">
-                            ${item[currentLang]}
-                        </span>
-                    `;
-                    list.appendChild(label);
-                });
-                catDiv.appendChild(list);
-                container.appendChild(catDiv);
-            });
-
-            // 更新進度條
-            const pct = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
-            document.getElementById('checklist-progress-text').innerText = `${checkedCount}/${total}`;
-            document.getElementById('checklist-progress-bar').style.width = `${pct}%`;
-        }
-
-        function updateChecklistStatus(id, isChecked) {
-            const savedData = JSON.parse(localStorage.getItem('racePlannerChecklist') || '{}');
-            savedData[id] = isChecked;
-            localStorage.setItem('racePlannerChecklist', JSON.stringify(savedData));
-            renderChecklist(); // 重新渲染以更新進度條與刪除線
-        }
-
-        function clearChecklist() {
-            const t = i18n[currentLang];
-            if (confirm(t.checklistConfirm)) {
-                localStorage.removeItem('racePlannerChecklist');
-                renderChecklist();
-            }
-        }
-        // --- 賽前清單核心邏輯結束 ---
-    </script>
+    <!-- 模組化載入指令碼：字典先載入，計算引擎後載入 -->
+    <script src="app-i18n.js"></script>
+    <script src="app-planner.js"></script>
 </body>
 </html>
